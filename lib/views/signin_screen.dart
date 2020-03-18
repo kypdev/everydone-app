@@ -1,6 +1,9 @@
+import 'package:everydone_app/views/bottom_nav.dart';
 import 'package:everydone_app/views/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'first_pressure.dart';
 
@@ -21,19 +24,22 @@ class _SigninScreenState extends State<SigninScreen> {
 
   Future _userSignin() async {
     print('login');
-
-    // if (_formKey.currentState.validate()) {
-    //   String _username = _usernameCtrl.text.trim();
-    //   String _password = _passwordCtrl.text;
-    //   print('username : ' + _username);
-    //   print('password : ' + _password);
-    // }
-
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FirstPressure(),
-        ));
+    FirebaseAuth.instance
+        .signInWithEmailAndPassword(
+        email: _usernameCtrl.text,
+        password: _passwordCtrl.text)
+        .then((currentUser) => Firestore.instance
+        .collection("users")
+        .document(currentUser.user.uid)
+        .get()
+        .then((DocumentSnapshot result) =>
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BottomNav(
+                ))))
+        .catchError((err) => print(err)))
+        .catchError((err) => print(err));
   }
 
   Future _facebookSignin() async {

@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "118319581249",
+    "firebase_url": "https://everydone-493b4.firebaseio.com",
+    "project_id": "everydone-493b4",
+    "storage_bucket": "everydone-493b4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:118319581249:android:b73675576da60085971ec0",
+        "android_client_info": {
+          "package_name": "com.kypdev.everydone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "118319581249-7mo1890ptrucget268hjret46a4alt9p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD38rxBXQUm_K4XntfIOwNSr1k0YG4VuBU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "118319581249-7mo1890ptrucget268hjret46a4alt9p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:118319581249:android:86f77daa172b2480971ec0",
+        "android_client_info": {
+          "package_name": "com.kypdev.everydone_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "118319581249-7mo1890ptrucget268hjret46a4alt9p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD38rxBXQUm_K4XntfIOwNSr1k0YG4VuBU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "118319581249-7mo1890ptrucget268hjret46a4alt9p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

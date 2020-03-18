@@ -1,8 +1,11 @@
 import 'package:everydone_app/views/alarm_screen.dart';
 import 'package:everydone_app/views/edit_profile.dart';
 import 'package:everydone_app/views/setting_sound.dart';
+import 'package:everydone_app/views/signin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 final _kanit = 'Kanit';
 
@@ -29,6 +32,18 @@ class _SettingScreenState extends State<SettingScreen> {
 
   _share() {
     debugPrint('share');
+  }
+
+  _changePassword(){
+    debugPrint('change password');
+  }
+
+  _signout(){
+    FirebaseAuth.instance
+        .signOut()
+        .then((result) =>
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> SigninScreen())))
+        .catchError((err) => print(err));
   }
 
   @override
@@ -66,6 +81,23 @@ class _SettingScreenState extends State<SettingScreen> {
                           menuName: 'แก้ไขโปรไฟล์',
                         ),
                       ),
+
+                      GestureDetector(
+                        onTap: () {
+                          _changePassword();
+                        },
+                        child: listMenu(
+                          w: MediaQuery.of(context).size.width,
+                          icon: Icon(
+                            FontAwesomeIcons.userCircle,
+                            color: Colors.black54,
+                          ),
+                          menuName: 'แก้ไขโปรไฟล์',
+                        ),
+                      ),
+
+
+
                       GestureDetector(
                         onTap: () {
                           _alarm();
@@ -79,32 +111,48 @@ class _SettingScreenState extends State<SettingScreen> {
                           menuName: 'เตือน',
                         ),
                       ),
+
                       GestureDetector(
                         onTap: () {
-                          _settingSound();
+                          _signout();
                         },
                         child: listMenu(
                           w: MediaQuery.of(context).size.width,
                           icon: Icon(
-                            Icons.volume_up,
+                            Icons.power_settings_new,
                             color: Colors.black54,
                           ),
-                          menuName: 'ตั้งค่าเสียง',
+                          menuName: 'ออกจากระบบ',
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          _share();
-                        },
-                        child: listMenu(
-                          w: MediaQuery.of(context).size.width,
-                          icon: Icon(
-                            Icons.share,
-                            color: Colors.black54,
-                          ),
-                          menuName: 'แชร์',
-                        ),
-                      ),
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     _settingSound();
+                      //   },
+                      //   child: listMenu(
+                      //     w: MediaQuery.of(context).size.width,
+                      //     icon: Icon(
+                      //       Icons.volume_up,
+                      //       color: Colors.black54,
+                      //     ),
+                      //     menuName: 'ตั้งค่าเสียง',
+                      //   ),
+                      // ),
+
+
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     _share();
+                      //   },
+                      //   child: listMenu(
+                      //     w: MediaQuery.of(context).size.width,
+                      //     icon: Icon(
+                      //       Icons.share,
+                      //       color: Colors.black54,
+                      //     ),
+                      //     menuName: 'แชร์',
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

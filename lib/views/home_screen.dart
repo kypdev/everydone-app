@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:custom_switch/custom_switch.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 final _kanit = 'Kanit';
 
@@ -13,6 +14,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool status = false;
+  int _sysValue = 50;
+  int _diaValue = 50;
+  int _pulseValue = 50;
 
   _onchangeSwitch() {
     setState(() {
@@ -30,6 +34,32 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future _savePressure() {
+    debugPrint('save');
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('pressure value'),
+            content: Column(
+              children: <Widget>[
+                Text('SYS : ' + _sysValue.toString()),
+                Text('DIA : ' + _diaValue.toString()),
+                Text('PULSE : ' + _pulseValue.toString()),
+              ],
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,63 +68,191 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             color: Colors.black12,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                height: 30,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Card(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Row(
-                            children: <Widget>[
-                              Switch(
-                                activeColor: Colors.greenAccent,
-                                onChanged: (value) {
-                                  setState(() {
-                                    status = value;
-                                  });
-                                },
-                                value: status,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                'ใส่ด้วยตนเอง',
-                                style: TextStyle(
-                                  fontFamily: _kanit,
-                                  fontSize: 18,
+          Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  height: 30,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: Card(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Row(
+                              children: <Widget>[
+                                Switch(
+                                  activeColor: Colors.greenAccent,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      status = value;
+                                    });
+                                  },
+                                  value: status,
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: 10),
+                                Text(
+                                  'ใส่ด้วยตนเอง',
+                                  style: TextStyle(
+                                    fontFamily: _kanit,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Container(
-                          child: status
-                              ? manual()
-                              : camera(
-                                  w: MediaQuery.of(context).size.width,
-                                  deviceName: _deviceName,
-                                  h: MediaQuery.of(context).size.height,
-                                  pressureImage: 'assets/images/device.jpg',
-                                  selectFunction: _selectPressureDevice,
-                                ),
-                        ),
-                        SizedBox(height: 20),
-                        detailPressure(),
-                      ],
+                          Container(
+                            child: status
+                                ? Center(
+                                  child: Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Column(
+
+                                            children: <Widget>[
+                                              Table(
+                                                columnWidths: {
+                                                  0: FlexColumnWidth(2.0),
+                                                  1: FlexColumnWidth(6.0),
+                                                  2: FlexColumnWidth(8.0),
+                                                  3: FlexColumnWidth(6.0),
+                                                },
+                                                children: [
+                                                  TableRow(
+                                                    children: [
+                                                      Container(),
+                                                      Container(
+                                                        child: Text(
+                                                          'Systolic',
+                                                          style: TextStyle(
+                                                            fontFamily: _kanit,
+                                                            fontSize: 22.0,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        child: Text(
+                                                          'Diastolic',
+                                                          style: TextStyle(
+                                                            fontFamily: _kanit,
+                                                            fontSize: 22.0,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        child: Text(
+                                                          'Pulse',
+                                                          style: TextStyle(
+                                                            fontFamily: _kanit,
+                                                            fontSize: 22.0,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+
+                                            ],
+                                          ),
+                                          Table(
+                                            columnWidths: {
+                                              0: FlexColumnWidth(5.0),
+                                              1: FlexColumnWidth(5.0),
+                                              2: FlexColumnWidth(5.0),
+                                            },
+                                            children: [
+                                              TableRow(
+                                                children: [
+                                                  NumberPicker.integer(
+                                                    initialValue: _sysValue,
+                                                    minValue: 20,
+                                                    maxValue: 200,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        _sysValue = value;
+                                                      });
+                                                    },
+                                                  ),
+                                                  NumberPicker.integer(
+                                                    initialValue: _diaValue,
+                                                    minValue: 20,
+                                                    maxValue: 200,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        _diaValue = value;
+                                                      });
+                                                    },
+                                                  ),
+                                                  NumberPicker.integer(
+                                                    initialValue: _pulseValue,
+                                                    minValue: 20,
+                                                    maxValue: 200,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        _pulseValue = value;
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+
+                                          SizedBox(height: 20),
+
+                                          Padding(
+                                                padding: const EdgeInsets.symmetric(
+                                                    horizontal: 20),
+                                                child: Container(
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.greenAccent,
+                                                  ),
+                                                  child: MaterialButton(
+                                                    onPressed: () {
+                                                      _savePressure();
+                                                    },
+                                                    child: Text(
+                                                      'บันทึก',
+                                                      style: TextStyle(
+                                                        fontFamily: _kanit,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+
+                                        ],
+                                      ),
+                                    ),
+                                )
+                                : camera(
+                                    w: MediaQuery.of(context).size.width,
+                                    deviceName: _deviceName,
+                                    h: MediaQuery.of(context).size.height,
+                                    pressureImage: 'assets/images/device.jpg',
+                                    selectFunction: _selectPressureDevice,
+                                  ),
+                          ),
+                          
+                          SizedBox(height: 20),
+                          detailPressure(),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -115,7 +273,9 @@ Widget switchBar({
   );
 }
 
-Widget manual() {
+Widget manual({
+  Function sys,
+}) {
   return Container(
     child: Column(
       children: <Widget>[
@@ -128,23 +288,29 @@ Widget manual() {
           children: [
             TableRow(
               children: [
-                Container(
-                  color: Colors.greenAccent,
-                  height: 10.0,
+                NumberPicker.integer(
+                  highlightSelectedValue: true,
+                  initialValue: 50,
+                  minValue: 20,
+                  maxValue: 200,
+                  onChanged: sys,
                 ),
-                Container(
-                  color: Colors.yellow,
-                  height: 10.0,
+                NumberPicker.integer(
+                  initialValue: 50,
+                  minValue: 20,
+                  maxValue: 200,
+                  onChanged: sys,
                 ),
-                Container(
-                  color: Colors.pink,
-                  height: 10.0,
+                NumberPicker.integer(
+                  initialValue: 50,
+                  minValue: 20,
+                  maxValue: 200,
+                  onChanged: sys,
                 ),
               ],
             ),
           ],
         ),
-        
       ],
     ),
   );
