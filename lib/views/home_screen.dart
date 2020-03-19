@@ -358,33 +358,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ],
                                           ),
-                                          Table(
-                                            columnWidths: {
-                                              0: FlexColumnWidth(3),
-                                              1: FlexColumnWidth(3),
-                                              2: FlexColumnWidth(2),
-                                            },
-                                            children: [
-                                              TableRow(
-                                                children: [
-                                                  Text(
-                                                    'DIA:',
-                                                    textAlign: TextAlign.end,
-                                                    style: TextStyle(
-                                                        fontFamily: _kanit,
-                                                        fontSize: 40),
-                                                  ),
-                                                  Text(
-                                                    ' ${_diaImgValue}',
-                                                    style: TextStyle(
-                                                        fontFamily: _kanit,
-                                                        fontSize: 40),
-                                                  ),
-
-                                                ],
-                                              ),
-                                            ],
-                                          ),
                                           Padding(
                                             padding: const EdgeInsets.only(
                                                 left: 40, right: 40),

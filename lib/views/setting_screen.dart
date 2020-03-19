@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 final _kanit = 'Kanit';
 
 class SettingScreen extends StatefulWidget {
@@ -34,15 +33,15 @@ class _SettingScreenState extends State<SettingScreen> {
     debugPrint('share');
   }
 
-  _changePassword(){
+  _changePassword() {
     debugPrint('change password');
   }
 
-  _signout(){
+  _signout() {
     FirebaseAuth.instance
         .signOut()
-        .then((result) =>
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> SigninScreen())))
+        .then((result) => Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => SigninScreen())))
         .catchError((err) => print(err));
   }
 
@@ -84,22 +83,6 @@ class _SettingScreenState extends State<SettingScreen> {
 
                       GestureDetector(
                         onTap: () {
-                          _changePassword();
-                        },
-                        child: listMenu(
-                          w: MediaQuery.of(context).size.width,
-                          icon: Icon(
-                            FontAwesomeIcons.userCircle,
-                            color: Colors.black54,
-                          ),
-                          menuName: 'แก้ไขโปรไฟล์',
-                        ),
-                      ),
-
-
-
-                      GestureDetector(
-                        onTap: () {
                           _alarm();
                         },
                         child: listMenu(
@@ -138,7 +121,6 @@ class _SettingScreenState extends State<SettingScreen> {
                       //     menuName: 'ตั้งค่าเสียง',
                       //   ),
                       // ),
-
 
                       // GestureDetector(
                       //   onTap: () {
