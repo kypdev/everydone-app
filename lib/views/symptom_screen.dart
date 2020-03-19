@@ -1,5 +1,9 @@
+import 'package:everydone_app/commons/symtom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'dart:async';
 
 final _kanit = 'Kanit';
 
@@ -8,9 +12,140 @@ class SymptomScreen extends StatefulWidget {
   _SymptomScreenState createState() => _SymptomScreenState();
 }
 
-class _SymptomScreenState extends State<SymptomScreen> {
+enum TtsState { playing, stopped }
 
-  
+class _SymptomScreenState extends State<SymptomScreen> {
+  FlutterTts flutterTts;
+  TtsState ttsState = TtsState.stopped;
+
+  get isPlaying => ttsState == TtsState.playing;
+
+  get isStopped => ttsState == TtsState.stopped;
+
+  @override
+  initState() {
+    super.initState();
+    initTts();
+  }
+
+  initTts() {
+    flutterTts = FlutterTts();
+
+//    _getLanguages();
+
+    flutterTts.setStartHandler(() {
+      setState(() {
+        print("playing");
+        ttsState = TtsState.playing;
+      });
+    });
+
+    flutterTts.setCompletionHandler(() {
+      setState(() {
+        print("Complete");
+        ttsState = TtsState.stopped;
+      });
+    });
+
+    flutterTts.setErrorHandler((msg) {
+      setState(() {
+        print("error: $msg");
+        ttsState = TtsState.stopped;
+      });
+    });
+  }
+
+  Future _speak(String desc) async {
+    await flutterTts.isLanguageAvailable("th-TH");
+    if (desc != null) {
+      if (desc.isNotEmpty) {
+        var result = await flutterTts.speak(desc);
+        if (result == 1) setState(() => ttsState = TtsState.playing);
+      }
+    }
+  }
+
+  Future _stop() async {
+    var result = await flutterTts.stop();
+    if (result == 1) setState(() => ttsState = TtsState.stopped);
+  }
+
+  Widget symptonMenu({
+    w,
+    String title,
+    String des,
+  }) {
+    _textToSpeechPlay() {
+      print('text to speech play');
+    }
+
+    _textToSpeechPause() {
+      print('text to speech pause');
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Container(
+        width: w,
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                title,
+                style: TextStyle(
+                  fontFamily: _kanit,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  '     ${des}',
+                  style: TextStyle(
+                    fontFamily: _kanit,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 4,
+              ),
+              Container(
+                width: w,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        FontAwesomeIcons.volumeUp,
+                        color: Colors.grey,
+                      ),
+                      onPressed: _textToSpeechPlay,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        FontAwesomeIcons.volumeMute,
+                        color: Colors.grey,
+                      ),
+                      onPressed: _textToSpeechPause,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,90 +158,103 @@ class _SymptomScreenState extends State<SymptomScreen> {
         backgroundColor: Colors.greenAccent,
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              color: Colors.black12,
-            ),
-            Column(
-              children: <Widget>[
-                symptonMenu(
-                  w: MediaQuery.of(context).size.width,
-                  title: 'ปวดศีรษะ',
-                  des:
-                      '     ผู้ป่วยมักจะมีอาการปวดศีรษะในกรณีที่ความดันขึ้นอย่างรวดเร็วหรือเกิดภาวะ Hypertensive crisis โดยทั่วไปความดันโลหิตตัวบน Systolic จะมากกว่า 110 มม ปรอท หรือ Diastolic มากกว่า 110 มม ปรอท อาการปวดศีรษะมักจะปวดมึนๆบางคนปวดตลอดวัน ปวดมากเวลาถ่ายอุจาระ หากเป็นมากจะมีอาการคลื่นไส้อาเจียน',
+      body: Stack(
+        children: <Widget>[
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Colors.black12,
+          ),
+          SafeArea(
+            child: Center(
+              child: Container(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: Firestore.instance
+                      .collection("DiseaseSymptoms")
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError)
+                      return Text('Error: ${snapshot.error}');
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return new Text('Loading...');
+                      default:
+                        return new ListView(
+                          children: snapshot.data.documents
+                              .map((DocumentSnapshot document) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Container(
+                                  color: Colors.white,
+                                  child: Column(
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        document['title'],
+                                        style: TextStyle(
+                                          fontFamily: _kanit,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Text(
+                                          '     ${document['desc']}',
+                                          style: TextStyle(
+                                            fontFamily: _kanit,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 4,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          IconButton(
+                                            icon: Icon(
+                                              FontAwesomeIcons.volumeUp,
+                                              color: Colors.grey,
+                                            ),
+                                            onPressed: () =>
+                                                _speak(document['desc']),
+                                          ),
+                                          IconButton(
+                                            icon: Icon(
+                                              FontAwesomeIcons.volumeMute,
+                                              color: Colors.grey,
+                                            ),
+                                            onPressed: () => _stop,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                    }
+                  },
                 ),
-              ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-}
-
-Widget symptonMenu({
-  w,
-  String title,
-  String des,
-}) {
-
-  _textToSpeech(){
-    print('text to speech');
-  }
-
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20),
-    child: Container(
-      width: w,
-      child: Card(
-        
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              title,
-              style: TextStyle(
-                fontFamily: _kanit,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
-                des,
-                style: TextStyle(
-                  fontFamily: _kanit,
-                  fontSize: 16,
-                  
-                ),
-              ),
-            ),
-            SizedBox(height: 10,),
-
-            RaisedButton(
-              onPressed: (){
-                _textToSpeech();
-              },
-              color: Colors.greenAccent,
-              child: Container(
-                width: w,
-                child: Icon(FontAwesomeIcons.volumeUp),
-              ),
-            ),
-          ],
-        ),
-      ),
-      
-    ),
-  );
 }

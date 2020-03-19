@@ -64,6 +64,39 @@ class _SigninScreenState extends State<SigninScreen> {
   }
 
   @override
+  void initState() {
+
+    FirebaseAuth.instance
+        .currentUser()
+        .then((currentUser) => {
+      if (currentUser == null)
+        {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => SigninScreen()))
+        }
+      else
+        {
+          Firestore.instance
+              .collection("users")
+              .document(currentUser.uid)
+              .get()
+              .then((DocumentSnapshot result) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        BottomNav(
+                        )));
+            dispose();
+          })
+              .catchError((err) => print(err))
+        }
+    })
+        .catchError((err) => print(err));
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
@@ -140,7 +173,7 @@ class _SigninScreenState extends State<SigninScreen> {
                                 ),
                                 controller: _passwordCtrl,
                                 decoration: InputDecoration(
-                                  
+
                                   prefixIcon: Icon(Icons.lock),
                                   labelText: 'รหัสผ่าน',
                                   labelStyle: TextStyle(
