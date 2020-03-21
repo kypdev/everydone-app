@@ -1,12 +1,11 @@
-import 'package:everydone_app/views/bottom_nav.dart';
-import 'package:everydone_app/views/bottom_navy.dart';
-import 'package:everydone_app/views/register_page.dart';
+import 'package:everydone_app/views/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
-import 'first_pressure.dart';
+import 'bottom_navy.dart';
 
 final _kanit = 'Kanit';
 
@@ -16,31 +15,60 @@ class SigninScreen extends StatefulWidget {
 }
 
 class _SigninScreenState extends State<SigninScreen> {
-  bool visible = false;
-  TextEditingController _usernameCtrl = new TextEditingController();
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+  TextEditingController emailInputController;
+  TextEditingController pwdInputController;
+  bool showPwd;
 
-  TextEditingController _passwordCtrl = new TextEditingController();
+  @override
+  initState() {
+    emailInputController = new TextEditingController();
+    pwdInputController = new TextEditingController();
+    showPwd = true;
+    super.initState();
+  }
 
-  final _formKey = GlobalKey<FormState>();
-
-  Future _userSignin() async {
-    print('login');
-    FirebaseAuth.instance
-        .signInWithEmailAndPassword(
-        email: _usernameCtrl.text,
-        password: _passwordCtrl.text)
-        .then((currentUser) => Firestore.instance
-        .collection("users")
-        .document(currentUser.user.uid)
-        .get()
-        .then((DocumentSnapshot result) =>
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => BottomNav(
-                ))))
-        .catchError((err) => print(err)))
-        .catchError((err) => print(err));
+  _signin() {
+    debugPrint('login');
+    String email = emailInputController.text.trim().toString();
+    String pwd = pwdInputController.text.toString();
+    debugPrint('email: ${email}');
+    debugPrint('pass: ${pwd}');
+    if (_loginFormKey.currentState.validate()) {
+      FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: email,
+            password: pwd,
+          )
+          .then((currrentUser) => Firestore.instance
+              .collection("users")
+              .document(currrentUser.user.uid)
+              .get()
+              .then((DocumentSnapshot result) => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => BottomNavy()))))
+          .catchError((err) {
+        print(err);
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "คำเตือน",
+          desc: "อีเมลล์หรือรหัสผ่านผิด",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "ยืนยัน",
+                style: TextStyle(
+                    fontFamily: _kanit, color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Color.fromRGBO(0, 179, 134, 1.0),
+              radius: BorderRadius.circular(0.0),
+            ),
+          ],
+        ).show();
+      });
+    }
   }
 
   Future _facebookSignin() async {
@@ -56,7 +84,7 @@ class _SigninScreenState extends State<SigninScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => RegisterPage(),
+          builder: (context) => SignupScreen(),
         ));
   }
 
@@ -64,37 +92,57 @@ class _SigninScreenState extends State<SigninScreen> {
     print('forgotpassword');
   }
 
-  @override
-  void initState() {
+  Widget _formSignin({
+    Icon icon,
+    Function val,
+    String label,
+    TextEditingController controller,
+    Widget suffixIcon,
+    bool ob,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      child: TextFormField(
+        controller: controller,
+        validator: val,
+        decoration: InputDecoration(
+          errorStyle: TextStyle(
+            fontFamily: _kanit,
+          ),
+          prefixIcon: icon,
+          fillColor: Colors.grey[100],
+          filled: true,
+          labelText: label,
+          labelStyle: TextStyle(
+            fontFamily: _kanit,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          suffixIcon: suffixIcon,
+        ),
+        obscureText: ob,
+      ),
+    );
+  }
 
-    FirebaseAuth.instance
-        .currentUser()
-        .then((currentUser) => {
-      if (currentUser == null)
-        {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => SigninScreen()))
-        }
-      else
-        {
-          Firestore.instance
-              .collection("users")
-              .document(currentUser.uid)
-              .get()
-              .then((DocumentSnapshot result) {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        BottomNavy(
-                        )));
-            dispose();
-          })
-              .catchError((err) => print(err))
-        }
-    })
-        .catchError((err) => print(err));
+  String emailValidator(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (!regex.hasMatch(value) && value.length < 5) {
+      return 'อีเมลล์ไม่ถูกต้อง';
+    } else {
+      return null;
+    }
+  }
 
-    super.initState();
+  String pwdValidator(String value) {
+    if (value.length < 8) {
+      return 'Password must be longer than 8 characters';
+    } else {
+      return null;
+    }
   }
 
   @override
@@ -108,249 +156,221 @@ class _SigninScreenState extends State<SigninScreen> {
               h: MediaQuery.of(context).size.height,
               half: MediaQuery.of(context).size.height / 1.8,
             ),
-            SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Card(
-                      elevation: 5,
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'ชื่อผู้ใช้ห้ามว่าง';
-                                  } else if (value.length < 6) {
-                                    return 'ชื่อผู้ใช้ห้ามน้อยกว่า 6 ตัวอักษร';
-                                  } else {
-                                    return null;
+            SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 20, right: 20, top: 20),
+                      child: Card(
+                        elevation: 5,
+                        child: Form(
+                          key: _loginFormKey,
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(
+                                height: 20,
+                              ),
+                              _formSignin(
+                                ob: false,
+                                label: 'อีเมลล์',
+                                controller: emailInputController,
+                                icon: Icon(FontAwesomeIcons.envelope),
+                                val: emailValidator,
+                              ),
+                              _formSignin(
+                                ob: showPwd,
+                                label: 'รหัสผ่าน',
+                                controller: pwdInputController,
+                                icon: Icon(FontAwesomeIcons.lock),
+                                val: (value) {
+                                  if (value.length < 6) {
+                                    return 'รหัสผ่านต้องมากกว่า 5 ตัวอักษร';
                                   }
                                 },
-                                style: TextStyle(
-                                  fontFamily: _kanit,
-                                ),
-                                controller: _usernameCtrl,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.person),
-                                  labelText: 'ชื่อผู้ใช้',
-                                  labelStyle: TextStyle(
-                                    fontFamily: _kanit,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'รหัสผ่านห้ามว่าง';
-                                  } else if (value.length < 8) {
-                                    return 'รหัสผ่านห้ามน้อยกว่า 8 ตัวอักษร';
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                                obscureText: true,
-                                style: TextStyle(
-                                  fontFamily: _kanit,
-                                ),
-                                controller: _passwordCtrl,
-                                decoration: InputDecoration(
-
-                                  prefixIcon: Icon(Icons.lock),
-                                  labelText: 'รหัสผ่าน',
-                                  labelStyle: TextStyle(
-                                    fontFamily: _kanit,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: Container(
-                                width: double.infinity,
-                                child: MaterialButton(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  child: Text(
-                                    'login',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    showPwd
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
                                   ),
                                   onPressed: () {
-                                    _userSignin();
+                                    setState(() {
+                                      if (showPwd == true) {
+                                        showPwd = false;
+                                      } else {
+                                        showPwd = true;
+                                      }
+                                    });
                                   },
                                 ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Color.fromRGBO(0, 255, 0, 20),
-                                      Color.fromRGBO(220, 200, 0, 10)
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: Container(
+                                  width: double.infinity,
+                                  child: MaterialButton(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: Text(
+                                      'login',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    onPressed: _signin,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color.fromRGBO(0, 255, 0, 20),
+                                        Color.fromRGBO(220, 200, 0, 10)
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 25),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    GestureDetector(
+                                      onTap: () {
+                                        _register();
+                                      },
+                                      child: Text(
+                                        'สมัครสมาชิก',
+                                        style: TextStyle(fontFamily: _kanit),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        _forgotPassword();
+                                      },
+                                      child: Text(
+                                        'ลืมรหัสผ่าน?',
+                                        style: TextStyle(fontFamily: _kanit),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  SizedBox(width: 20),
+                                  Expanded(
+                                    child: Divider(
+                                      color: Colors.black54,
+                                      thickness: 1,
+                                    ),
+                                  ),
+                                  SizedBox(width: 20),
+                                  Text(
+                                    'หรือเข้าสู่ระบบด้วย',
+                                    style: TextStyle(
+                                      fontFamily: _kanit,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(width: 20),
+                                  Expanded(
+                                    child: Divider(
+                                      color: Colors.black54,
+                                      thickness: 1,
+                                    ),
+                                  ),
+                                  SizedBox(width: 20),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  onPressed: () {
+                                    _facebookSignin();
+                                  },
+                                  color: Color(0xff3b5998),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Icon(
+                                        FontAwesomeIcons.facebook,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(width: 20),
+                                      Text(
+                                        'เข้าสู่ระบบด้วย Facebook',
+                                        style: TextStyle(
+                                            fontFamily: _kanit,
+                                            color: Colors.white),
+                                      )
                                     ],
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 8),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 25),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  GestureDetector(
-                                    onTap: () {
-                                      _register();
-                                    },
-                                    child: Text(
-                                      'สมัครสมาชิก',
-                                      style: TextStyle(fontFamily: _kanit),
-                                    ),
+                              SizedBox(height: 5),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      _forgotPassword();
-                                    },
-                                    child: Text(
-                                      'ลืมรหัสผ่าน?',
-                                      style: TextStyle(fontFamily: _kanit),
-                                    ),
+                                  onPressed: () {
+                                    _googleSignin();
+                                  },
+                                  color: Color(0xffDB4437),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Icon(
+                                        FontAwesomeIcons.google,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(width: 20),
+                                      Text(
+                                        'เข้าสู่ระบบด้วย Google',
+                                        style: TextStyle(
+                                            fontFamily: _kanit,
+                                            color: Colors.white),
+                                      )
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Row(
-                              children: <Widget>[
-                                SizedBox(width: 20),
-                                Expanded(
-                                  child: Divider(
-                                    color: Colors.black54,
-                                    thickness: 1,
-                                  ),
-                                ),
-                                SizedBox(width: 20),
-                                Text(
-                                  'หรือเข้าสู่ระบบด้วย',
-                                  style: TextStyle(
-                                    fontFamily: _kanit,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(width: 20),
-                                Expanded(
-                                  child: Divider(
-                                    color: Colors.black54,
-                                    thickness: 1,
-                                  ),
-                                ),
-                                SizedBox(width: 20),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: RaisedButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                onPressed: () {
-                                  _facebookSignin();
-                                },
-                                color: Color(0xff3b5998),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      FontAwesomeIcons.facebook,
-                                      color: Colors.white,
-                                    ),
-                                    SizedBox(width: 20),
-                                    Text(
-                                      'เข้าสู่ระบบด้วย Facebook',
-                                      style: TextStyle(
-                                          fontFamily: _kanit,
-                                          color: Colors.white),
-                                    )
-                                  ],
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 5),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: RaisedButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                onPressed: () {
-                                  _googleSignin();
-                                },
-                                color: Color(0xffDB4437),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      FontAwesomeIcons.google,
-                                      color: Colors.white,
-                                    ),
-                                    SizedBox(width: 20),
-                                    Text(
-                                      'เข้าสู่ระบบด้วย Google',
-                                      style: TextStyle(
-                                          fontFamily: _kanit,
-                                          color: Colors.white),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                          ],
+                              SizedBox(height: 20),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
             Center(
               child: Visibility(
-                  visible: visible,
+                  visible: false,
                   child: Container(
                       margin: EdgeInsets.only(bottom: 30),
                       child: CircularProgressIndicator())),
