@@ -232,6 +232,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   child: Text(
                                                     'บันทึก',
                                                     style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 20.0,
                                                       fontFamily: _kanit,
                                                     ),
                                                   ),

@@ -238,9 +238,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   _register() {
-    setState(() {
-      load = true;
-    });
+
     print('register');
     if (_registerFormKey.currentState.validate()) {
       String firstname = firstNameInputController.text.trim().toString();
@@ -257,6 +255,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
       if (pwdInputController.text ==
           confirmPwdInputController.text){
+        setState(() {
+          load = true;
+        });
         FirebaseAuth.instance
             .createUserWithEmailAndPassword(
             email: email,

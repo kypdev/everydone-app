@@ -31,15 +31,16 @@ class _SigninScreenState extends State<SigninScreen> {
   }
 
   _signin() {
-    setState(() {
-      load = true;
-    });
+
     debugPrint('login');
     String email = emailInputController.text.trim().toString();
     String pwd = pwdInputController.text.toString();
     debugPrint('email: ${email}');
     debugPrint('pass: ${pwd}');
     if (_loginFormKey.currentState.validate()) {
+      setState(() {
+        load = true;
+      });
       FirebaseAuth.instance
           .signInWithEmailAndPassword(
             email: email,
@@ -232,6 +233,19 @@ class _SigninScreenState extends State<SigninScreen> {
                                     onPressed: _signin,
                                   ),
                                   decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 20.0,
+                                        // has the effect of softening the shadow
+                                        spreadRadius: 4.0,
+                                        // has the effect of extending the shadow
+                                        offset: Offset(
+                                          8.0, // horizontal, move right 10
+                                          8.0, // vertical, move down 10
+                                        ),
+                                      )
+                                    ],
                                     borderRadius: BorderRadius.circular(30),
                                     gradient: LinearGradient(
                                       colors: [
@@ -242,7 +256,7 @@ class _SigninScreenState extends State<SigninScreen> {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 8),
+                              SizedBox(height: 20),
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 25),
@@ -307,58 +321,66 @@ class _SigninScreenState extends State<SigninScreen> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
                                 child: RaisedButton(
+                                  elevation: 20,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(30),
                                   ),
-                                  onPressed: () {
-                                    _facebookSignin();
-                                  },
+                                  onPressed: _facebookSignin,
                                   color: Color(0xff3b5998),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(
-                                        FontAwesomeIcons.facebook,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(width: 20),
-                                      Text(
-                                        'เข้าสู่ระบบด้วย Facebook',
-                                        style: TextStyle(
-                                            fontFamily: _kanit,
-                                            color: Colors.white),
-                                      )
-                                    ],
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10, bottom: 10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Icon(
+                                          FontAwesomeIcons.facebook,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(width: 20),
+                                        Text(
+                                          'เข้าสู่ระบบด้วย Facebook',
+                                          style: TextStyle(
+                                              fontFamily: _kanit,
+                                              color: Colors.white),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 5),
+                              SizedBox(height: 15),
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
                                 child: RaisedButton(
+                                  elevation: 20,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(30),
                                   ),
-                                  onPressed: () {
-                                    _googleSignin();
-                                  },
+                                  onPressed: _googleSignin,
                                   color: Color(0xffDB4437),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(
-                                        FontAwesomeIcons.google,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(width: 20),
-                                      Text(
-                                        'เข้าสู่ระบบด้วย Google',
-                                        style: TextStyle(
-                                            fontFamily: _kanit,
-                                            color: Colors.white),
-                                      )
-                                    ],
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10, bottom: 10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Icon(
+                                          FontAwesomeIcons.google,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(width: 20),
+                                        Text(
+                                          'เข้าสู่ระบบด้วย Google',
+                                          style: TextStyle(
+                                              fontFamily: _kanit,
+                                              color: Colors.white),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
