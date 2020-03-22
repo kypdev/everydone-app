@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final _kanit = 'Kanit';
 
@@ -8,203 +10,188 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
+  String userID = '';
+
+  inputData() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseUser user = await auth.currentUser();
+    final uid = user.uid.toString();
+    print(uid);
+    setState(() {
+      userID = uid;
+    });
+  }
+
+
+  @override
+  void initState() {
+    inputData();
+    print(userID);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('ประวัติการบันทึก'),
-      //   centerTitle: true,
-      //   backgroundColor: Colors.greenAccent,
-      //   leading: Container(),
-      // ),
-      body: Container(
-        color: Colors.black12,
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 40,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Card(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      historyPressure(
-                        sys: '120',
-                        dia: '80',
-                        status: 'ปกติ',
-                        date: '20/09/2019',
-                        time: '11:30',
-                        avg: '80',
-                        colorStatus: Colors.lightGreenAccent,
-                      ),
-                      historyPressure(
-                        sys: '139',
-                        dia: '77',
-                        status: 'สูงกว่าปกติ',
-                        date: '21/09/2019',
-                        time: '08:30',
-                        avg: '66',
-                        colorStatus: Colors.yellow,
-                      ),
-                      historyPressure(
-                        sys: '171',
-                        dia: '77',
-                        status: 'สูงระดับ 2',
-                        date: '22/09/2019',
-                        time: '08:30',
-                        avg: '66',
-                        colorStatus: Colors.red,
-                      ),
-                      historyPressure(
-                        sys: '120',
-                        dia: '80',
-                        status: 'สูงกว่าปกติ',
-                        date: '22/09/2019',
-                        time: '08:30',
-                        avg: '80',
-                        colorStatus: Colors.yellow,
-                      ),
-                      historyPressure(
-                        sys: '133',
-                        dia: '97',
-                        status: 'สูงระดับ 1',
-                        date: '23/09/2019',
-                        time: '08:30',
-                        avg: '71',
-                        colorStatus: Colors.orangeAccent,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+      body: Stack(
+        children: <Widget>[
+          Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.black12,
+          ),
+          Container(
+              padding: const EdgeInsets.all(20.0),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: Firestore.instance
+                    .collection("users")
+                    .document(userID)
+                    .collection('pressure')
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError)
+                    return new Text('Error: ${snapshot.error}');
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return new Text('Loading...');
+                    default:
+                      return new ListView(
+                        children: snapshot.data.documents
+                            .map((DocumentSnapshot document) {
+                          return history(
+                            rate: document['rate'].toString(),
+                            sys: document['sys'].toString(),
+                            dia: document['dia'].toString(),
+                            date: 'time',
+                            pulse: document['pulse'].toString(),
+                          );
+
+                        }).toList(),
+                      );
+                  }
+                },
+              )),
+        ],
       ),
     );
   }
 }
 
-Widget historyPressure({
+Widget history({
   String sys,
+  String rate,
   String dia,
-  String status,
   String date,
-  String time,
-  String avg,
-  Color colorStatus,
+  String pulse,
 }) {
-  return Padding(
-    padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-    child: Column(
-      children: <Widget>[
-        Row(
+  return Card(
+    child: Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
+      child: SingleChildScrollView(
+        child: Column(
           children: <Widget>[
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorStatus,
-              ),
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Text(
-                    sys,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: _kanit,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Divider(
-                      color: Colors.white,
-                      thickness: 2,
-                      height: 2,
-                    ),
-                  ),
-                  Text(
-                    dia,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: _kanit,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  status,
-                  style: TextStyle(
-                    fontFamily: _kanit,
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.amber,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        sys,
+                        style: TextStyle(
+                          fontFamily: _kanit,
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 4, right: 4, top: 2, bottom: 2),
+                        child: Divider(
+                          height: 3,
+                          thickness: 2,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        dia,
+                        style: TextStyle(
+                          fontFamily: _kanit,
+                          color: Colors.white,
+                          fontSize: 20
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+
+                SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      date,
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    Text(
-                      ',',
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      time,
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      '|',
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      avg,
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      'bpm',
+                      rate,
                       style: TextStyle(
-                        color: Colors.black54,
                         fontFamily: _kanit,
+                        fontSize: 20,
                       ),
                     ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(height: 10),
+                        Text(
+                          date,
+                          style: TextStyle(
+                            fontFamily: _kanit,
+                            fontSize: 18,
+                            color: Colors.black45,
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                        Text(
+                          '|',
+                          style: TextStyle(
+                            fontFamily: _kanit,
+                            fontSize: 18,
+                            color: Colors.black45,
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                        Text(
+                          pulse,
+                          style: TextStyle(
+                            fontFamily: _kanit,
+                            fontSize: 18,
+                            color: Colors.black45,
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                        Text(
+                          'bpm',
+                          style: TextStyle(
+                            fontFamily: _kanit,
+                            fontSize: 18,
+                            color: Colors.black45,
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ],
             ),
           ],
         ),
-        SizedBox(
-          height: 10,
-        ),
-        Divider(
-          color: Colors.black,
-          thickness: 1,
-        ),
-      ],
+      ),
     ),
   );
 }
