@@ -24,7 +24,7 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController pwdInputController;
   TextEditingController confirmPwdInputController;
   File _imageFile;
-
+  bool load;
   int _gender_value;
   bool showPwd;
 
@@ -180,6 +180,7 @@ class _SignupScreenState extends State<SignupScreen> {
     pwdInputController = new TextEditingController();
     confirmPwdInputController = new TextEditingController();
     showPwd = true;
+    load = false;
     super.initState();
   }
 
@@ -237,6 +238,9 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   _register() {
+    setState(() {
+      load = true;
+    });
     print('register');
     if (_registerFormKey.currentState.validate()) {
       String firstname = firstNameInputController.text.trim().toString();
@@ -279,6 +283,9 @@ class _SignupScreenState extends State<SignupScreen> {
           confirmPwdInputController.clear()
         })
             .catchError((err) {
+              setState(() {
+                load = false;
+              });
               print(err);
 //              if(signUpError is PlatformException) {
 //                if(signUpError.code == 'ERROR_EMAIL_ALREADY_IN_USE') {
@@ -465,6 +472,13 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ],
             ),
+          ),
+          Center(
+            child: Visibility(
+                visible: load,
+                child: Container(
+                    margin: EdgeInsets.only(bottom: 30),
+                    child: CircularProgressIndicator())),
           ),
         ],
       ),

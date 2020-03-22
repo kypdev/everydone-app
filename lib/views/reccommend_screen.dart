@@ -9,11 +9,11 @@ class ReccommendScreen extends StatefulWidget {
 
 class _ReccommendScreenState extends State<ReccommendScreen> {
   _foodReccomment(){
-    Navigator.push(context, MaterialPageRoute(builder: (context) => FoodReccommend()));
+    Navigator.of(context).push(_createRoute(screen: FoodReccommend()));
   }
 
   _symptom(){
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SymptomScreen(),),);
+    Navigator.of(context).push(_createRoute(screen: SymptomScreen()));
   }
 
   
@@ -113,5 +113,23 @@ Widget reccomList({w, String title, String img,}) {
         ),
       ),
     ),
+  );
+}
+
+Route _createRoute({screen}) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => screen,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
   );
 }

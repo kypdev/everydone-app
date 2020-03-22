@@ -19,16 +19,21 @@ class _SigninScreenState extends State<SigninScreen> {
   TextEditingController emailInputController;
   TextEditingController pwdInputController;
   bool showPwd;
+  bool load;
 
   @override
   initState() {
     emailInputController = new TextEditingController();
     pwdInputController = new TextEditingController();
     showPwd = true;
+    load = false;
     super.initState();
   }
 
   _signin() {
+    setState(() {
+      load = true;
+    });
     debugPrint('login');
     String email = emailInputController.text.trim().toString();
     String pwd = pwdInputController.text.toString();
@@ -49,6 +54,9 @@ class _SigninScreenState extends State<SigninScreen> {
                   MaterialPageRoute(builder: (context) => BottomNavy()))))
           .catchError((err) {
         print(err);
+        setState(() {
+          load = false;
+        });
         Alert(
           context: context,
           type: AlertType.error,
@@ -81,11 +89,7 @@ class _SigninScreenState extends State<SigninScreen> {
 
   Future _register() async {
     print('register');
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SignupScreen(),
-        ));
+    Navigator.of(context).push(_createRoute(screen: SignupScreen()));
   }
 
   Future _forgotPassword() async {
@@ -370,7 +374,7 @@ class _SigninScreenState extends State<SigninScreen> {
             ),
             Center(
               child: Visibility(
-                  visible: false,
+                  visible: load,
                   child: Container(
                       margin: EdgeInsets.only(bottom: 30),
                       child: CircularProgressIndicator())),
@@ -390,5 +394,23 @@ Widget bg({h, half}) {
         color: Color(0xff82E0AA),
       ),
     ],
+  );
+}
+
+Route _createRoute({screen}) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => screen,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
   );
 }
