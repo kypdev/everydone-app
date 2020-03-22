@@ -1,11 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:everydone_app/views/choose_device.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/semantics.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:custom_switch/custom_switch.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final _kanit = 'Kanit';
 
@@ -21,12 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _pulseValue = 50;
   int _sysImgValue = 126;
   int _diaImgValue = 96;
-
-  _onchangeSwitch() {
-    setState(() {
-      status = false;
-    });
-  }
+  String userID = '';
 
   String _deviceName = 'yuwell YE670A';
 
@@ -39,45 +34,130 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future _savePressure() {
+  String rate = 'default';
+
+  Future _savePressure() async {
     debugPrint('save');
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('pressure value'),
-            content: Column(
-              children: <Widget>[
-                Text('SYS : ' + _sysValue.toString()),
-                Text('DIA : ' + _diaValue.toString()),
-                Text('PULSE : ' + _pulseValue.toString()),
-              ],
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        });
+    int sys = int.parse(_sysValue.toString());
+    int dia = int.parse(_diaValue.toString());
+    int pulse = int.parse(_pulseValue.toString());
+
+    debugPrint('sys: ${_sysValue.toString()}');
+    debugPrint('dia: ${_diaValue.toString()}');
+    debugPrint('pulse: ${_pulseValue.toString()}');
+
+    if (sys > 160 && dia > 100) {
+      setState(() {
+        rate = 'สูงระดับ 2';
+      });
+    } else if ((sys >= 141 && sys <= 160) && (dia >= 91 && dia <= 100)) {
+      setState(() {
+        rate = 'สูงระดับ 1';
+      });
+    } else if ((sys >= 121 && sys <= 140) && (dia >= 81 && dia <= 90)) {
+      setState(() {
+        rate = 'สูงกว่าปกติ';
+      });
+    } else if ((sys >= 91 && sys <= 120) && (dia >= 61 && dia <= 80)) {
+      setState(() {
+        rate = 'ปกติ';
+      });
+    } else if (sys < 90 && dia < 60) {
+      setState(() {
+        rate = 'ต่ำ';
+      });
+    } else {
+      setState(() {
+        rate = 'ไม่สามารถคำนวณได้';
+      });
+    }
+
+    print(rate);
+
+    String alertType = '';
+    if (rate == 'ไม่สามารถคำนวณได้') {
+      alertType = 'error';
+    } else {
+      alertType = 'success';
+    }
+
+    Alert(
+      context: context,
+      type: AlertType.success,
+      title: "ผลการคำนวณ",
+      desc: rate,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "ยืนยัน",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () => Navigator.pop(context),
+          width: 120,
+        )
+      ],
+    ).show();
+
+    // get uid
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseUser user = await auth.currentUser();
+    final uid = user.uid.toString();
+    print(uid);
+    setState(() {
+      userID = uid;
+    });
+
+
+
+    // add pressure to firebase
+    Firestore.instance
+      .collection("users")
+      .document(userID)
+      .collection('pressure')
+      .add({
+        "sys": sys,
+        "dia": dia,
+        "pulse": pulse,
+        "create_at": DateTime.now(),
+        "rate": rate
+    })
+    .then((result)=>{
+      print('add success')
+    })
+      .catchError((err) {
+        print(err);
+        Alert(
+          context: context,
+          type: AlertType.success,
+          title: "ผลการคำนวณ",
+          desc: rate,
+          buttons: [
+            DialogButton(
+              child: Text(
+                "ยืนยัน",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+              width: 120,
+            )
+          ],
+        ).show();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Stack(
-          children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              color: Colors.black12,
-            ),
-            Center(
-              child: Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Stack(
+            children: <Widget>[
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                color: Colors.black12,
+              ),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   SizedBox(
@@ -332,7 +412,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ),
                                           ),
-
                                           Table(
                                             columnWidths: {
                                               0: FlexColumnWidth(3),
@@ -355,12 +434,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         fontFamily: _kanit,
                                                         fontSize: 40),
                                                   ),
-
                                                 ],
                                               ),
                                             ],
                                           ),
-
                                           Table(
                                             columnWidths: {
                                               0: FlexColumnWidth(3),
@@ -383,7 +460,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         fontFamily: _kanit,
                                                         fontSize: 40),
                                                   ),
-
                                                 ],
                                               ),
                                             ],
@@ -414,7 +490,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ),
                             ),
-
                             detailPressure(),
                           ],
                         ),
@@ -423,8 +498,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -637,13 +712,13 @@ Widget titleDetailPressure() {
         color: Colors.redAccent,
         detailLevel: 'สูงระดับ 2',
         sys: '> 160',
-        dia: '100 - 109',
+        dia: '> 100',
       ),
       rowPressure(
         color: Colors.orangeAccent,
         detailLevel: 'สูงระดับ 1',
-        sys: '140 - 159',
-        dia: '90 - 99',
+        sys: '141 - 160',
+        dia: '91 - 100',
       ),
       rowPressure(
         color: Colors.yellow,
@@ -660,7 +735,7 @@ Widget titleDetailPressure() {
       rowPressure(
         color: Colors.purple,
         detailLevel: 'ต่ำ',
-        sys: 'ต่ำ',
+        sys: '< 90',
         dia: '< 60',
       ),
     ],
