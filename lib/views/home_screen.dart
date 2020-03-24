@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _sysImgValue = 126;
   int _diaImgValue = 96;
   String userID = '';
+  String color = null;
 
   String _deviceName = 'yuwell YE670A';
 
@@ -49,22 +50,27 @@ class _HomeScreenState extends State<HomeScreen> {
     if (sys > 160 && dia > 100) {
       setState(() {
         rate = 'สูงระดับ 2';
+        color = 'Colors.red';
       });
     } else if ((sys >= 141 && sys <= 160) && (dia >= 91 && dia <= 100)) {
       setState(() {
         rate = 'สูงระดับ 1';
+        color = 'Colors.amber';
       });
     } else if ((sys >= 121 && sys <= 140) && (dia >= 81 && dia <= 90)) {
       setState(() {
         rate = 'สูงกว่าปกติ';
+        color = 'Colors.yellow';
       });
     } else if ((sys >= 91 && sys <= 120) && (dia >= 61 && dia <= 80)) {
       setState(() {
         rate = 'ปกติ';
+        color = 'Colors.greenAccent';
       });
     } else if (sys < 90 && dia < 60) {
       setState(() {
         rate = 'ต่ำ';
+        color = 'Colors.purple';
       });
     } else {
       setState(() {
@@ -108,23 +114,41 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
 
-
-    // add pressure to firebase
-    Firestore.instance
-      .collection("users")
-      .document(userID)
-      .collection('pressure')
-      .add({
+    if(rate == 'ไม่สามารถคำนวณได้'){
+      Alert(
+        context: context,
+        type: AlertType.success,
+        title: "ผลการคำนวณ",
+        desc: rate,
+        buttons: [
+          DialogButton(
+            child: Text(
+              "ยืนยัน",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+            width: 120,
+          )
+        ],
+      ).show();
+    }else{
+      // add pressure to firebase
+      Firestore.instance
+          .collection("users")
+          .document(userID)
+          .collection('pressure')
+          .add({
         "sys": sys,
         "dia": dia,
         "pulse": pulse,
-        "create_at": DateTime.now(),
-        "rate": rate
-    })
-    .then((result)=>{
-      print('add success')
-    })
-      .catchError((err) {
+        "create_at": DateTime.now().day.toString() + '/' + DateTime.now().month.toString() + '/' + DateTime.now().year.toString() + ', ' + DateTime.now().hour.toString() + ':' + DateTime.now().minute.toString(),
+        "rate": rate,
+        "color": color
+      })
+          .then((result)=>{
+        print('add success')
+      })
+          .catchError((err) {
         print(err);
         Alert(
           context: context,
@@ -142,7 +166,9 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           ],
         ).show();
-    });
+      });
+    }
+
   }
 
   @override

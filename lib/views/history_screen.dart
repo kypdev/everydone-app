@@ -11,6 +11,7 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   String userID = '';
+  Color pColor = null;
 
   inputData() async {
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -22,25 +23,38 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
+  Future<DocumentSnapshot> getColor() {
+    print(pColor);
+    var color = Firestore.instance
+        .collection('user')
+        .document(userID)
+        .collection('pressure')
+        .document('color')
+        .get();
+
+    print(color);
+  }
 
   @override
   void initState() {
     inputData();
     print(userID);
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            color: Colors.black12,
-          ),
-          Container(
+      body: SafeArea(
+        child: Stack(
+          children: <Widget>[
+            Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.black12,
+            ),
+            Container(
               padding: const EdgeInsets.all(20.0),
               child: StreamBuilder<QuerySnapshot>(
                 stream: Firestore.instance
@@ -54,7 +68,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     return new Text('Error: ${snapshot.error}');
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
-                      return new Text('Loading...');
+                      return Center(child: new Text('Loading...'));
                     default:
                       return new ListView(
                         children: snapshot.data.documents
@@ -63,16 +77,37 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             rate: document['rate'].toString(),
                             sys: document['sys'].toString(),
                             dia: document['dia'].toString(),
-                            date: 'time',
+                            date: document['create_at'].toString(),
                             pulse: document['pulse'].toString(),
+                            color: (document['color'].toString() ==
+                                    'Colors.greenAccent')
+                                ? pColor = Colors.greenAccent
+                                : (document['color'].toString() ==
+                                        'Colors.purple')
+                                    ? pColor = Colors.purple
+                                    : (document['color'].toString() ==
+                                            'Colors.yellow')
+                                        ? pColor = Colors.yellow
+                                        : (document['color'].toString() ==
+                                                'Colors.amber')
+                                            ? pColor = Colors.amber
+                                            : (document['color'].toString() ==
+                                                    'Colors.amber')
+                                                ? pColor = Colors.amber
+                                                : pColor = Colors.red,
                           );
-
                         }).toList(),
                       );
                   }
                 },
-              )),
-        ],
+              ),
+            ),
+            RaisedButton(
+              child: Text('aaa'),
+              onPressed: getColor,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -84,6 +119,7 @@ Widget history({
   String dia,
   String date,
   String pulse,
+  Color color,
 }) {
   return Card(
     child: Padding(
@@ -99,7 +135,7 @@ Widget history({
                   height: 70,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.amber,
+                    color: color,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -124,15 +160,13 @@ Widget history({
                       Text(
                         dia,
                         style: TextStyle(
-                          fontFamily: _kanit,
-                          color: Colors.white,
-                          fontSize: 20
-                        ),
+                            fontFamily: _kanit,
+                            color: Colors.white,
+                            fontSize: 20),
                       ),
                     ],
                   ),
                 ),
-
                 SizedBox(width: 20),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,16 +190,11 @@ Widget history({
                             color: Colors.black45,
                           ),
                         ),
-                        SizedBox(width: 20),
-                        Text(
-                          '|',
-                          style: TextStyle(
-                            fontFamily: _kanit,
-                            fontSize: 18,
-                            color: Colors.black45,
-                          ),
-                        ),
-                        SizedBox(width: 20),
+                        SizedBox(width: 8),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
                         Text(
                           pulse,
                           style: TextStyle(
@@ -174,7 +203,7 @@ Widget history({
                             color: Colors.black45,
                           ),
                         ),
-                        SizedBox(width: 20),
+                        SizedBox(width: 8),
                         Text(
                           'bpm',
                           style: TextStyle(
