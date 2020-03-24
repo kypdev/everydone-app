@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 final _kanit = 'Kanit';
 
@@ -61,6 +62,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     .collection("users")
                     .document(userID)
                     .collection('pressure')
+                .orderBy("create_at", descending: true)
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -73,6 +75,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       return new ListView(
                         children: snapshot.data.documents
                             .map((DocumentSnapshot document) {
+
                           return history(
                             rate: document['rate'].toString(),
                             sys: document['sys'].toString(),
@@ -95,6 +98,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                     'Colors.amber')
                                                 ? pColor = Colors.amber
                                                 : pColor = Colors.red,
+
                           );
                         }).toList(),
                       );
@@ -102,10 +106,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 },
               ),
             ),
-            RaisedButton(
-              child: Text('aaa'),
-              onPressed: getColor,
-            ),
+
           ],
         ),
       ),

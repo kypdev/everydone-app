@@ -1,3 +1,5 @@
+import 'package:everydone_app/services/update_image_profile.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_cropper/image_cropper.dart';
@@ -6,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:path/path.dart';
 
 import 'bottom_navy.dart';
 
@@ -27,6 +30,9 @@ class _SignupScreenState extends State<SignupScreen> {
   bool load;
   int _gender_value;
   bool showPwd;
+  final _formKey = GlobalKey<FormState>();
+  FirebaseAuth _auth =  FirebaseAuth.instance;
+  UpdateImageProfile updateImageProfile = UpdateImageProfile();
 
 
   Future<void> _cropImage() async {
@@ -237,10 +243,10 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  _register() {
+  _register(BuildContext context) async {
 
     print('register');
-    if (_registerFormKey.currentState.validate()) {
+
       String firstname = firstNameInputController.text.trim().toString();
       String lastname = lastNameInputController.text.trim().toString();
       String email = emailInputController.text.trim().toString();
@@ -316,9 +322,104 @@ class _SignupScreenState extends State<SignupScreen> {
         ).show();
       }
 
+    Future uploadImage(BuildContext context) async {
+      String fileName = basename(_imageFile.path);
+      final StorageReference firebaseStorageRef = FirebaseStorage.instance
+          .ref()
+          .child('CustomerProfile/${fileName.toString()}');
+      StorageUploadTask task = firebaseStorageRef.putFile(_imageFile);
+      StorageTaskSnapshot snapshotTask = await task.onComplete;
+      String downloadUrl = await snapshotTask.ref.getDownloadURL();
+      if (downloadUrl != null) {
+        updateImageProfile.updatePro(downloadUrl.toString(), context).then((val) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => BottomNavy()),
+              ModalRoute.withName('/'));
+        }).catchError((e) {
+          print('upload error ${e}');
+        });
+      }
+    }
 
+    signUp(BuildContext context) async {
+      if(_registerFormKey.currentState.validate()){
+        _auth.createUserWithEmailAndPassword(
+            email: emailInputController.text.trim(),
+            password: pwdInputController.text)
+            .then((currentUser) =>
+            Firestore.instance.collection('users')
+                .document(currentUser.user.uid)
+                .setData({
+              'FirstName': firstNameInputController.text.trim(),
+              'LastName': lastNameInputController.text.trim(),
+
+              'email': emailInputController.text.trim(),
+              'uid': currentUser.user.uid,
+              'role': 'user'
+            }).then((user) {
+              print('user ok ${currentUser}');
+              uploadImage(context);
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context)=>BottomNavy()),
+                  ModalRoute.withName('/'));
+            }).catchError((e) {
+              print('profile ${e}');
+            })
+        );
+      }
+    }
+
+
+  }
+
+  Future uploadImage(BuildContext context) async {
+    String fileName = basename(_imageFile.path);
+    final StorageReference firebaseStorageRef = FirebaseStorage.instance
+        .ref()
+        .child('CustomerProfile/${fileName.toString()}');
+    StorageUploadTask task = firebaseStorageRef.putFile(_imageFile);
+    StorageTaskSnapshot snapshotTask = await task.onComplete;
+    String downloadUrl = await snapshotTask.ref.getDownloadURL();
+    if (downloadUrl != null) {
+      updateImageProfile.updatePro(downloadUrl.toString(), context).then((val) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => BottomNavy()),
+            ModalRoute.withName('/'));
+      }).catchError((e) {
+        print('upload error ${e}');
+      });
     }
   }
+
+  signup(BuildContext context){
+    _auth.createUserWithEmailAndPassword(
+        email: emailInputController.text.trim(),
+        password: pwdInputController.text.trim())
+        .then((currentUser) =>
+        Firestore.instance.collection('users')
+            .document(currentUser.user.uid)
+            .setData({
+          'FirstName': firstNameInputController.text.trim(),
+          'LastName': lastNameInputController.text.trim(),
+          'email': emailInputController.text.trim(),
+          'uid': currentUser.user.uid,
+          'role': 'user'
+        }).then((user) {
+          print('user ok ${currentUser}');
+          uploadImage(context);
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context)=>BottomNavy()),
+              ModalRoute.withName('/'));
+        }).catchError((e) {
+          print('profile ${e}');
+        })
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -444,7 +545,11 @@ class _SignupScreenState extends State<SignupScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
-                                onPressed: _register,
+                                onPressed: (){
+                                  if(_registerFormKey.currentState.validate()){
+                                          signup(context);
+                                  }
+                                },
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[

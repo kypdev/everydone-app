@@ -142,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "dia": dia,
         "pulse": pulse,
         "create_at": DateTime.now().day.toString() + '/' + DateTime.now().month.toString() + '/' + DateTime.now().year.toString() + ', ' + DateTime.now().hour.toString() + ':' + DateTime.now().minute.toString(),
+        "update_at": FieldValue.serverTimestamp(),
         "rate": rate,
         "color": color
       })
@@ -286,6 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 TableRow(
                                                   children: [
                                                     NumberPicker.integer(
+                                                      highlightSelectedValue: true,
                                                       initialValue: _sysValue,
                                                       minValue: 20,
                                                       maxValue: 200,
@@ -330,11 +332,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     .width,
                                                 decoration: BoxDecoration(
                                                   color: Colors.greenAccent,
+                                                  borderRadius: BorderRadius.circular(30),
                                                 ),
                                                 child: MaterialButton(
-                                                  onPressed: () {
-                                                    _savePressure();
-                                                  },
+                                                  onPressed: _savePressure,
                                                   child: Text(
                                                     'บันทึก',
                                                     style: TextStyle(
@@ -358,6 +359,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             padding: const EdgeInsets.only(
                                                 left: 20, right: 20),
                                             child: RaisedButton(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(30),
+                                              ),
                                               color: Colors.greenAccent,
                                               onPressed: _selectPressureDevice,
                                               child: Text(
@@ -420,6 +424,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             padding: const EdgeInsets.only(
                                                 left: 40, right: 40),
                                             child: MaterialButton(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(30),
+                                              ),
                                               color: Colors.greenAccent,
                                               onPressed: () {},
                                               child: Container(
@@ -494,6 +501,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             padding: const EdgeInsets.only(
                                                 left: 40, right: 40),
                                             child: MaterialButton(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(30),
+                                              ),
                                               color: Colors.greenAccent,
                                               onPressed: () {},
                                               child: Container(
