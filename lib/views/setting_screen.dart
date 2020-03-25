@@ -15,8 +15,7 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   _editProfile() {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => EditProfile()));
+    Navigator.of(context).push(_createRoute(screen: EditProfile()));
   }
 
   _alarm() {
@@ -48,99 +47,119 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Stack(
-          children: <Widget>[
-            Container(
-              color: Colors.black12,
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 20,
-                  right: 20,
-                ),
-                child: Card(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: <Widget>[
-                      SizedBox(
-                        height: 20,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _editProfile();
-                        },
-                        child: listMenu(
-                          w: MediaQuery.of(context).size.width,
-                          icon: Icon(
-                            FontAwesomeIcons.userCircle,
-                            color: Colors.black54,
-                          ),
-                          menuName: 'แก้ไขโปรไฟล์',
+      body: SafeArea(
+        child: Center(
+          child: Stack(
+            children: <Widget>[
+              Container(
+                color: Colors.black12,
+              ),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                  ),
+                  child: Card(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 20,
                         ),
-                      ),
-
-                      GestureDetector(
-                        onTap: () {
-                          _alarm();
-                        },
-                        child: listMenu(
-                          w: MediaQuery.of(context).size.width,
-                          icon: Icon(
-                            Icons.alarm,
-                            color: Colors.black54,
+                        GestureDetector(
+                          onTap: () {
+                            _editProfile();
+                          },
+                          child: listMenu(
+                            w: MediaQuery.of(context).size.width,
+                            icon: Icon(
+                              FontAwesomeIcons.userCircle,
+                              color: Colors.black54,
+                            ),
+                            menuName: 'แก้ไขโปรไฟล์',
                           ),
-                          menuName: 'เตือน',
                         ),
-                      ),
 
-                      GestureDetector(
-                        onTap: () {
-                          _signout();
-                        },
-                        child: listMenu(
-                          w: MediaQuery.of(context).size.width,
-                          icon: Icon(
-                            Icons.power_settings_new,
-                            color: Colors.black54,
+                        GestureDetector(
+                          onTap: () {
+                            _editProfile();
+                          },
+                          child: listMenu(
+                            w: MediaQuery.of(context).size.width,
+                            icon: Icon(
+                              FontAwesomeIcons.userCircle,
+                              color: Colors.black54,
+                            ),
+                            menuName: 'เปลี่ยนรหัสผ่าน',
                           ),
-                          menuName: 'ออกจากระบบ',
                         ),
-                      ),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     _settingSound();
-                      //   },
-                      //   child: listMenu(
-                      //     w: MediaQuery.of(context).size.width,
-                      //     icon: Icon(
-                      //       Icons.volume_up,
-                      //       color: Colors.black54,
-                      //     ),
-                      //     menuName: 'ตั้งค่าเสียง',
-                      //   ),
-                      // ),
 
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     _share();
-                      //   },
-                      //   child: listMenu(
-                      //     w: MediaQuery.of(context).size.width,
-                      //     icon: Icon(
-                      //       Icons.share,
-                      //       color: Colors.black54,
-                      //     ),
-                      //     menuName: 'แชร์',
-                      //   ),
-                      // ),
-                    ],
+                        GestureDetector(
+                          onTap: () {
+                            _alarm();
+                          },
+                          child: listMenu(
+                            w: MediaQuery.of(context).size.width,
+                            icon: Icon(
+                              Icons.alarm,
+                              color: Colors.black54,
+                            ),
+                            menuName: 'เตือน',
+                          ),
+                        ),
+
+                        GestureDetector(
+                          onTap: () {
+                            _settingSound();
+                          },
+                          child: listMenu(
+                            w: MediaQuery.of(context).size.width,
+                            icon: Icon(
+                              Icons.volume_up,
+                              color: Colors.black54,
+                            ),
+                            menuName: 'ตั้งค่าเสียง',
+                          ),
+                        ),
+
+                         GestureDetector(
+                           onTap: () {
+                             _share();
+                           },
+                           child: listMenu(
+                             w: MediaQuery.of(context).size.width,
+                             icon: Icon(
+                               Icons.share,
+                               color: Colors.black54,
+                             ),
+                             menuName: 'แชร์',
+                           ),
+                         ),
+
+                        GestureDetector(
+                          onTap: () {
+                            _signout();
+                          },
+                          child: listMenu(
+                            w: MediaQuery.of(context).size.width,
+                            icon: Icon(
+                              Icons.power_settings_new,
+                              color: Colors.black54,
+                            ),
+                            menuName: 'ออกจากระบบ',
+                          ),
+                        ),
+
+
+
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -192,5 +211,23 @@ Widget listMenu({
         ],
       ),
     ),
+  );
+}
+
+Route _createRoute({screen}) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => screen,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
   );
 }
