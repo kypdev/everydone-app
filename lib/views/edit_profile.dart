@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:everydone_app/views/signin_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 final String _kanit = 'Kanit';
 
@@ -29,44 +31,19 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
-  Future readFirestore() async {
-    CollectionReference collectionReference = _firestore.collection('users');
 
-    subscription = await collectionReference.snapshots().listen((d) {
-      snapshots = d.documents;
-
-      for (var snap in snapshots) {
-        String imgPro = snap.data['imgProfile'];
-        String firstname = snap.data['FirstName'];
-        String lastname = snap.data['LastName'];
-        String email = snap.data['email'];
-        setState(() {
-          img = imgPro.toString();
-          fname = firstname.toString();
-          lname = lastname.toString();
-          emails = email.toString();
-        });
-        print(
-            'firstname: ${fname}, lastname: ${lname}, email: ${emails} img: ${imgPro}, ');
-      }
-    });
-  }
-
-  Future<DocumentReference> getUserDoc() async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    final Firestore _firestore = Firestore.instance;
-
-    FirebaseUser user = await _auth.currentUser();
-    DocumentReference ref = _firestore.collection('users').document(user.uid);
-    print(ref);
+  _signout() {
+    FirebaseAuth.instance
+        .signOut()
+        .then((result) => Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => SigninScreen())))
+        .catchError((err) => print(err));
   }
 
   @override
   void initState() {
     inputData();
     super.initState();
-    readFirestore();
-    getUserDoc();
   }
 
   @override
@@ -74,43 +51,27 @@ class _EditProfileState extends State<EditProfile> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'แก้ไขโปรไฟล์',
+          'โปรไฟล์',
           style: TextStyle(fontFamily: _kanit),
         ),
         centerTitle: true,
         backgroundColor: Colors.greenAccent,
       ),
-      body: Stack(
-        children: <Widget>[
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.black12,
-          ),
-          SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Center(
-                  child: StreamBuilder(
-                    stream: Firestore.instance
-                        .collection('users')
-                        .document(userID)
-                        .snapshots(),
-                    builder: (context, sn) {
-                      var img = sn.data['imgProfile'];
-                      var firstname = sn.data['FirstName'].toString();
-                      return profile(
-                        img: img,
-                        firstname: firstname,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      body: StreamBuilder(
+        stream:
+            Firestore.instance.collection('users').document(userID).snapshots(),
+        builder: (context, sn) {
+          var img = sn.data['imgProfile'];
+          var firstname = sn.data['FirstName'].toString();
+          var lastname = sn.data['LastName'].toString();
+          var email = sn.data['email'].toString();
+          return profile(
+            img: img,
+            firstname: firstname,
+            lastname: lastname,
+            email: email,
+          );
+        },
       ),
     );
   }
@@ -118,31 +79,135 @@ class _EditProfileState extends State<EditProfile> {
   Widget profile({
     img,
     firstname,
+    lastname,
+    email
   }) {
-    return Card(
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
       child: Container(
         width: MediaQuery.of(context).size.width,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(height: 12),
-            Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey, width: 5),
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: NetworkImage(
-                    img,
+            Center(
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, width: 5),
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: NetworkImage(
+                      img,
+                    ),
+                    fit: BoxFit.cover,
                   ),
-                  fit: BoxFit.cover,
                 ),
               ),
             ),
             SizedBox(height: 12),
-            Text(firstname)
+//            Row(
+//              mainAxisAlignment: MainAxisAlignment.center,
+//              children: <Widget>[
+//                Text(firstname,style: TextStyle(fontFamily: _kanit, fontSize: 22.0),),
+//                SizedBox(width: 20.0),
+//                Text(lastname,style: TextStyle(fontFamily: _kanit, fontSize: 22.0),),
+//              ],
+//            ),
+            SizedBox(height: 12),
+            _form(
+              title: 'ชื่อ',
+              content: firstname,
+            ),
+            _form(
+              title: 'นามสกุล',
+              content: lastname,
+            ),
+            _form(
+              title: 'อีเมลล์',
+              content: email,
+            ),
+            SizedBox(height: 20),
+            Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                width: double.infinity,
+                child: MaterialButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(
+                    'ออกจากระบบ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: _kanit,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                  onPressed: _signout,
+                ),
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 20.0,
+                      // has the effect of softening the shadow
+                      spreadRadius: 4.0,
+                      // has the effect of extending the shadow
+                      offset: Offset(
+                        8.0, // horizontal, move right 10
+                        8.0, // vertical, move down 10
+                      ),
+                    )
+                  ],
+                  borderRadius: BorderRadius.circular(30),
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromRGBO(255, 0, 100, 20),
+                      Color.fromRGBO(250, 150, 0, 10)
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+
+
+  Widget _form({
+    title,
+    content,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(
+              fontFamily: _kanit,
+              fontWeight: FontWeight.bold,
+              fontSize: 22.0,
+            ),
+          ),
+          Text(content, style: TextStyle(
+            fontFamily: _kanit,
+            fontSize: 18.0,
+            color: Colors.black54,
+          ),),
+          Divider(
+            thickness: 2,
+            color: Colors.black45,
+          ),
+        ],
       ),
     );
   }

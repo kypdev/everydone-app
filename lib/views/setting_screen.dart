@@ -36,13 +36,7 @@ class _SettingScreenState extends State<SettingScreen> {
     debugPrint('change password');
   }
 
-  _signout() {
-    FirebaseAuth.instance
-        .signOut()
-        .then((result) => Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => SigninScreen())))
-        .catchError((err) => print(err));
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +71,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               FontAwesomeIcons.userCircle,
                               color: Colors.black54,
                             ),
-                            menuName: 'แก้ไขโปรไฟล์',
+                            menuName: 'โปรไฟล์',
                           ),
                         ),
 
@@ -137,19 +131,7 @@ class _SettingScreenState extends State<SettingScreen> {
                            ),
                          ),
 
-                        GestureDetector(
-                          onTap: () {
-                            _signout();
-                          },
-                          child: listMenu(
-                            w: MediaQuery.of(context).size.width,
-                            icon: Icon(
-                              Icons.power_settings_new,
-                              color: Colors.black54,
-                            ),
-                            menuName: 'ออกจากระบบ',
-                          ),
-                        ),
+
 
 
 
