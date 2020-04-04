@@ -15,53 +15,78 @@ class BottomNavy extends StatefulWidget {
 
 class _BottomNavyState extends State<BottomNavy> {
   TextStyle style = TextStyle(fontFamily: _kanit);
-  int currentTab = 0;
-  final List<Widget> screens = [
-    HomeScreen(), HistoryScreen(), ReccommendScreen(), SettingScreen()
-  ];
-  Widget currentScreen = HomeScreen();
-  final PageStorageBucket bucket = PageStorageBucket();
+
+  int _currentIndex = 0;
+  PageController _pageController;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _pageController = PageController();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      body: PageStorage(child: currentScreen, bucket: bucket),
+      body: SizedBox.expand(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() => _currentIndex = index);
+          },
+          children: <Widget>[
+            HomeScreen(),
+            HistoryScreen(),
+            ReccommendScreen(),
+            SettingScreen(),
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavyBar(
-        selectedIndex: currentTab,
-        onItemSelected: (i) {
-          setState(() {
-            currentTab = i;
-            currentScreen = screens[i];
-          });
+        showElevation: true,
+        selectedIndex: _currentIndex,
+        onItemSelected: (index) {
+          setState(() => _currentIndex = index);
+          _pageController.jumpToPage(index);
         },
-        items: [
+        items: <BottomNavyBarItem>[
           BottomNavyBarItem(
-            icon: Icon(FontAwesomeIcons.home),
             title: Text('หน้าแรก', style: style),
+            icon: Icon(Icons.home),
+            activeColor: Colors.blue,
+            inactiveColor: Colors.grey[600],
+          ),
+          BottomNavyBarItem(
+            title: Text(
+              'ประวัติ',
+              style: style,
+            ),
+            icon: Icon(Icons.apps),
             activeColor: Colors.red,
-            textAlign: TextAlign.center,
+            inactiveColor: Colors.grey[600],
           ),
           BottomNavyBarItem(
-            icon: Icon(FontAwesomeIcons.chartBar),
-            title: Text('ประวัติ', style: style),
-            activeColor: Colors.purpleAccent,
-            textAlign: TextAlign.center,
-          ),
-          BottomNavyBarItem(
-            icon: Icon(FontAwesomeIcons.clipboardList),
             title: Text(
               'แนะนำ',
               style: style,
             ),
-            activeColor: Colors.pink,
-            textAlign: TextAlign.center,
+            icon: Icon(Icons.chat_bubble),
+            activeColor: Colors.deepPurple,
+            inactiveColor: Colors.grey[600],
           ),
           BottomNavyBarItem(
-            icon: Icon(FontAwesomeIcons.cog),
-            title: Text('ตั้งค่า'),
-            activeColor: Colors.blue,
-            textAlign: TextAlign.center,
+            title: Text(
+              'ตั้งค่า',
+              style: style,
+            ),
+            icon: Icon(Icons.settings),
+            inactiveColor: Colors.grey[600],
           ),
         ],
       ),
