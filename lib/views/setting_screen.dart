@@ -1,7 +1,6 @@
 import 'package:everydone_app/views/alarm_screen.dart';
 import 'package:everydone_app/views/edit_profile.dart';
 import 'package:everydone_app/views/setting_sound.dart';
-import 'package:everydone_app/views/signin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';

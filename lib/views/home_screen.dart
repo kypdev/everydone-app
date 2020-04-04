@@ -22,11 +22,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _sysImgValue = 126;
   int _diaImgValue = 96;
   String userID = '';
-  String color = null;
+  String color;
 
   String _deviceName = 'yuwell YE670A';
 
-  Future _selectPressureDevice() {
+  _selectPressureDevice() {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -80,12 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     print(rate);
 
-    String alertType = '';
-    if (rate == 'ไม่สามารถคำนวณได้') {
-      alertType = 'error';
-    } else {
-      alertType = 'success';
-    }
+    
+    
 
     Alert(
       context: context,

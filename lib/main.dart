@@ -1,5 +1,4 @@
 import 'package:everydone_app/views/bottom_navy.dart';
-import 'package:everydone_app/views/home_screen.dart';
 import 'package:everydone_app/views/splash_page.dart';
 import 'package:flutter/material.dart';
 

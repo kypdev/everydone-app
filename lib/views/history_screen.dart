@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
 
 final _kanit = 'Kanit';
 
@@ -12,7 +11,7 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   String userID = '';
-  Color pColor = null;
+  Color pColor;
 
   inputData() async {
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -24,17 +23,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
-  Future<DocumentSnapshot> getColor() {
-    print(pColor);
-    var color = Firestore.instance
-        .collection('user')
-        .document(userID)
-        .collection('pressure')
-        .document('color')
-        .get();
-
-    print(color);
-  }
 
   @override
   void initState() {
@@ -225,3 +213,20 @@ Widget history({
     ),
   );
 }
+
+
+// import 'package:flutter/material.dart';
+
+// class HistoryScreen extends StatefulWidget {
+//   @override
+//   _HistoryScreenState createState() => _HistoryScreenState();
+// }
+
+// class _HistoryScreenState extends State<HistoryScreen> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       color: Colors.amber,
+//     );
+//   }
+// }

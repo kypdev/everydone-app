@@ -58,7 +58,7 @@ class _BottomNavyState extends State<BottomNavy> {
         items: <BottomNavyBarItem>[
           BottomNavyBarItem(
             title: Text('หน้าแรก', style: style),
-            icon: Icon(Icons.home),
+            icon: Icon(FontAwesomeIcons.home),
             activeColor: Colors.blue,
             inactiveColor: Colors.grey[600],
           ),
