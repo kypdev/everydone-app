@@ -3,7 +3,6 @@ import 'package:everydone_app/views/edit_profile.dart';
 import 'package:everydone_app/views/setting_sound.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 final _kanit = 'Kanit';
 
@@ -31,9 +30,9 @@ class _SettingScreenState extends State<SettingScreen> {
     debugPrint('share');
   }
 
-  _changePassword() {
-    debugPrint('change password');
-  }
+  // _changePassword() {
+  //   debugPrint('change password');
+  // }
 
 
 
@@ -102,19 +101,19 @@ class _SettingScreenState extends State<SettingScreen> {
                           ),
                         ),
 
-                        GestureDetector(
-                          onTap: () {
-                            _settingSound();
-                          },
-                          child: listMenu(
-                            w: MediaQuery.of(context).size.width,
-                            icon: Icon(
-                              Icons.volume_up,
-                              color: Colors.black54,
-                            ),
-                            menuName: 'ตั้งค่าเสียง',
-                          ),
-                        ),
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     _settingSound();
+                        //   },
+                        //   child: listMenu(
+                        //     w: MediaQuery.of(context).size.width,
+                        //     icon: Icon(
+                        //       Icons.volume_up,
+                        //       color: Colors.black54,
+                        //     ),
+                        //     menuName: 'ตั้งค่าเสียง',
+                        //   ),
+                        // ),
 
                          GestureDetector(
                            onTap: () {

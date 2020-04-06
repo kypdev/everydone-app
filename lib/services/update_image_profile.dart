@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UpdateImageProfile {
-  Future updatePro(imgUrl, context) {
+  updatePro(imgUrl, context) {
     var userInfo = UserUpdateInfo();
     userInfo.photoUrl = imgUrl;
     FirebaseAuth.instance.currentUser().then((user) {
@@ -20,14 +20,14 @@ class UpdateImageProfile {
             }).then((user) {
               print('ok wow');
             }).catchError((e) {
-              print('can\'t change pages ${e}');
+              print('can\'t change pages ' + e);
             });
           })
           .catchError((e) {
-            print('users error ${e}');
+            print('users error '+ e);
           })
-          .catchError((e) => print('update pic ${e}'))
-          .catchError((e) => print('first ${e}'));
+          .catchError((e) => print('update pic '+ e))
+          .catchError((e) => print('first '+ e));
     });
   }
 }

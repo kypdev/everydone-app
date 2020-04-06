@@ -1,10 +1,7 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:everydone_app/views/signin_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 final String _kanit = 'Kanit';
 
@@ -16,8 +13,6 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   String image;
   String userID = '';
-  Firestore _firestore = Firestore.instance;
-  StreamSubscription<QuerySnapshot> subscription;
   List<DocumentSnapshot> snapshots;
   String img, fname, lname, emails;
 
@@ -31,12 +26,11 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
-
   _signout() {
     FirebaseAuth.instance
         .signOut()
         .then((result) => Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => SigninScreen())))
+            context, MaterialPageRoute(builder: (context) => SigninScreen())))
         .catchError((err) => print(err));
   }
 
@@ -76,12 +70,7 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  Widget profile({
-    img,
-    firstname,
-    lastname,
-    email
-  }) {
+  Widget profile({img, firstname, lastname, email}) {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
       child: Container(
@@ -130,8 +119,7 @@ class _EditProfileState extends State<EditProfile> {
             ),
             SizedBox(height: 20),
             Padding(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
                 width: double.infinity,
                 child: MaterialButton(
@@ -178,8 +166,6 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-
-
   Widget _form({
     title,
     content,
@@ -198,11 +184,14 @@ class _EditProfileState extends State<EditProfile> {
               fontSize: 22.0,
             ),
           ),
-          Text(content, style: TextStyle(
-            fontFamily: _kanit,
-            fontSize: 18.0,
-            color: Colors.black54,
-          ),),
+          Text(
+            content,
+            style: TextStyle(
+              fontFamily: _kanit,
+              fontSize: 18.0,
+              color: Colors.black54,
+            ),
+          ),
           Divider(
             thickness: 2,
             color: Colors.black45,

@@ -2,10 +2,8 @@ import 'package:everydone_app/services/update_image_profile.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path/path.dart';
@@ -28,28 +26,11 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController confirmPwdInputController;
   File _imageFile;
   bool load;
-  int _gender_value;
   bool showPwd;
-  final _formKey = GlobalKey<FormState>();
   FirebaseAuth _auth =  FirebaseAuth.instance;
   UpdateImageProfile updateImageProfile = UpdateImageProfile();
 
 
-  Future<void> _cropImage() async {
-    File cropped = await ImageCropper.cropImage(
-        sourcePath: _imageFile.path,
-        // ratioX: 1.0,
-        // ratioY: 1.0,
-        // maxWidth: 512,
-        // maxHeight: 512,
-        toolbarColor: Colors.purple,
-        toolbarWidgetColor: Colors.white,
-        toolbarTitle: 'Crop It');
-
-    setState(() {
-      _imageFile = cropped ?? _imageFile;
-    });
-  }
 
   /// Select an image via gallery or camera
   Future<void> _pickImage(ImageSource source) async {
@@ -243,137 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  _register(BuildContext context) async {
-
-    print('register');
-
-      String firstname = firstNameInputController.text.trim().toString();
-      String lastname = lastNameInputController.text.trim().toString();
-      String email = emailInputController.text.trim().toString();
-      String pwd = pwdInputController.text.toString();
-      String conpwd = confirmPwdInputController.text.toString();
-
-      debugPrint('firstname: ${firstname}');
-      debugPrint('lastname: ${lastname}');
-      debugPrint('email: ${email}');
-      debugPrint('pass: ${pwd}');
-      debugPrint('conpass: ${conpwd}');
-
-      if (pwdInputController.text ==
-          confirmPwdInputController.text){
-        setState(() {
-          load = true;
-        });
-        FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-            email: email,
-            password: pwd)
-            .then((currentUser) => Firestore.instance
-            .collection("users")
-            .document(currentUser.user.uid)
-            .setData({
-          "uid": currentUser.user.uid,
-          "fname": firstname,
-          "surname": lastname,
-          "email": email,
-        })
-            .then((result) => {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => BottomNavy()),
-                  (_) => false),
-          firstNameInputController.clear(),
-          lastNameInputController.clear(),
-          emailInputController.clear(),
-          pwdInputController.clear(),
-          confirmPwdInputController.clear()
-        })
-            .catchError((err) {
-              setState(() {
-                load = false;
-              });
-              print(err);
-//              if(signUpError is PlatformException) {
-//                if(signUpError.code == 'ERROR_EMAIL_ALREADY_IN_USE') {
-//                  /// `foo@bar.com` has alread been registered.
-//                }
-//              }
-        }));
-      }else{
-        Alert(
-          context: context,
-          type: AlertType.error,
-          title: "คำเตือน",
-          desc: "กรุณากรอกรหัสผ่านให้ตรงกัน",
-          buttons: [
-            DialogButton(
-              child: Text(
-                "ยืนยัน",
-                style: TextStyle(
-                  fontFamily: _kanit,
-                    color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-              color: Color.fromRGBO(0, 179, 134, 1.0),
-              radius: BorderRadius.circular(0.0),
-            ),
-          ],
-        ).show();
-      }
-
-    Future uploadImage(BuildContext context) async {
-      String fileName = basename(_imageFile.path);
-      final StorageReference firebaseStorageRef = FirebaseStorage.instance
-          .ref()
-          .child('CustomerProfile/${fileName.toString()}');
-      StorageUploadTask task = firebaseStorageRef.putFile(_imageFile);
-      StorageTaskSnapshot snapshotTask = await task.onComplete;
-      String downloadUrl = await snapshotTask.ref.getDownloadURL();
-      if (downloadUrl != null) {
-        updateImageProfile.updatePro(downloadUrl.toString(), context).then((val) {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => BottomNavy()),
-              ModalRoute.withName('/'));
-        }).catchError((e) {
-          print('upload error ${e}');
-        });
-      }
-    }
-
-    signUp(BuildContext context) async {
-      if(_registerFormKey.currentState.validate()){
-        _auth.createUserWithEmailAndPassword(
-            email: emailInputController.text.trim(),
-            password: pwdInputController.text)
-            .then((currentUser) =>
-            Firestore.instance.collection('users')
-                .document(currentUser.user.uid)
-                .setData({
-              'FirstName': firstNameInputController.text.trim(),
-              'LastName': lastNameInputController.text.trim(),
-
-              'email': emailInputController.text.trim(),
-              'uid': currentUser.user.uid,
-              'role': 'user'
-            }).then((user) {
-              print('user ok ${currentUser}');
-              uploadImage(context);
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context)=>BottomNavy()),
-                  ModalRoute.withName('/'));
-            }).catchError((e) {
-              print('profile ${e}');
-            })
-        );
-      }
-    }
-
-
-  }
-
+  
   Future uploadImage(BuildContext context) async {
     String fileName = basename(_imageFile.path);
     final StorageReference firebaseStorageRef = FirebaseStorage.instance
@@ -389,7 +240,7 @@ class _SignupScreenState extends State<SignupScreen> {
             MaterialPageRoute(builder: (context) => BottomNavy()),
             ModalRoute.withName('/'));
       }).catchError((e) {
-        print('upload error ${e}');
+        print('upload error ' +e);
       });
     }
   }
@@ -408,14 +259,14 @@ class _SignupScreenState extends State<SignupScreen> {
           'uid': currentUser.user.uid,
           'role': 'user'
         }).then((user) {
-          print('user ok ${currentUser}');
+          print('user ok ' +currentUser.user.uid);
           uploadImage(context);
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context)=>BottomNavy()),
               ModalRoute.withName('/'));
         }).catchError((e) {
-          print('profile ${e}');
+          print('profile $e');
         })
     );
   }
@@ -464,6 +315,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   if (value.length < 5) {
                                     return 'ชื่อห้ามน้อยกว่า 5 ตัวอักษร';
                                   }
+                                  return null;
                                 }),
                             _formSignup(
                                 ob: false,
@@ -474,6 +326,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   if (value.length < 5) {
                                     return 'นามสกุลห้ามน้อยกว่า 5 ตัวอักษร';
                                   }
+                                  return null;
                                 }),
                             _formSignup(
                               ob: false,
@@ -491,6 +344,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 if (value.length < 6) {
                                   return 'รหัสผ่านต้องมากกว่า 5 ตัวอักษร';
                                 }
+                                return null;
                               },
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -518,6 +372,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 if (value.length < 6) {
                                   return 'รหัสผ่านต้องมากกว่า 5 ตัวอักษร';
                                 }
+                                return null;
                               },
                               suffixIcon: IconButton(
                                 icon: Icon(

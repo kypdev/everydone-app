@@ -458,7 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         fontSize: 40),
                                                   ),
                                                   Text(
-                                                    ' ${_sysImgValue}',
+                                                    _sysImgValue.toString(),
                                                     style: TextStyle(
                                                         fontFamily: _kanit,
                                                         fontSize: 40),
@@ -484,7 +484,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         fontSize: 40),
                                                   ),
                                                   Text(
-                                                    ' ${_diaImgValue}',
+                                                    _diaImgValue.toString(),
                                                     style: TextStyle(
                                                         fontFamily: _kanit,
                                                         fontSize: 40),
