@@ -27,14 +27,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   }
 
   resetPassword() {
-    if(_formkey.currentState.validate()){
+    if (_formkey.currentState.validate()) {
       String emails = email.text.trim().toString();
       print(emails);
       _auth.sendPasswordResetEmail(email: emails);
-      
     }
     print('success');
-    
   }
 
   @override
@@ -128,11 +126,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                                        // Color.fromRGBO(0, 255, 0, 20),
-                                        // Color.fromRGBO(220, 200, 0, 10)
-                                        Colors.greenAccent,
-                                        Colors.greenAccent[700]
-                                      ],
+                              // Color.fromRGBO(0, 255, 0, 20),
+                              // Color.fromRGBO(220, 200, 0, 10)
+                              Colors.greenAccent,
+                              Colors.greenAccent[700]
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(30),
                         ),

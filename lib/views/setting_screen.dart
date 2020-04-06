@@ -1,4 +1,5 @@
 import 'package:everydone_app/views/alarm_screen.dart';
+import 'package:everydone_app/views/change_password.dart';
 import 'package:everydone_app/views/edit_profile.dart';
 import 'package:everydone_app/views/setting_sound.dart';
 import 'package:flutter/material.dart';
@@ -30,9 +31,10 @@ class _SettingScreenState extends State<SettingScreen> {
     debugPrint('share');
   }
 
-  // _changePassword() {
-  //   debugPrint('change password');
-  // }
+  _changePassword() {
+    debugPrint('change password');
+    Navigator.of(context).push(_createRoute(screen: ChangePassword()));
+  }
 
 
 
@@ -74,9 +76,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
 
                         GestureDetector(
-                          onTap: () {
-                            _editProfile();
-                          },
+                          onTap: _changePassword,
                           child: listMenu(
                             w: MediaQuery.of(context).size.width,
                             icon: Icon(
