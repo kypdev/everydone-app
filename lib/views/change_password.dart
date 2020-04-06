@@ -28,6 +28,10 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   changePassword() {
     print('change password');
+    String currntpwd = currentPassword.text.toString();
+    String newpwd = newPassword.text.toString();
+    String connewpwd = confirmNewPassword.text.toString();
+    print('current password: $currntpwd, new password: $newpwd, connew password: $connewpwd');
   }
 
   @override
@@ -115,7 +119,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                         ),
                         SizedBox(height: 20),
                         changePasswordForm(
-                          controller: currentPassword,
+                          controller: confirmNewPassword,
                           prefixIcon: Icon(
                             FontAwesomeIcons.lock,
                             color: Colors.grey,
