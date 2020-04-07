@@ -54,16 +54,15 @@ class _EditProfileState extends State<EditProfile> {
       body: StreamBuilder(
         stream:
             Firestore.instance.collection('users').document(userID).snapshots(),
-        builder: (context, sn) {
-          var img = sn.data['imgProfile'];
-          var firstname = sn.data['FirstName'].toString();
-          var lastname = sn.data['LastName'].toString();
-          var email = sn.data['email'].toString();
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return CircularProgressIndicator();
+          }
           return profile(
-            img: img,
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
+            email: snapshot.data['email'],
+            firstname: snapshot.data['FirstName'],
+            img: snapshot.data['imgProfile'],
+            lastname: snapshot.data['LastName'],
           );
         },
       ),
