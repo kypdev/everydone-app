@@ -5,7 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:everydone_app/commons/animation_route.dart';
 import 'bottom_navy.dart';
 
 final _kanit = 'Kanit';
@@ -21,7 +20,6 @@ class _SigninScreenState extends State<SigninScreen> {
   TextEditingController pwdInputController;
   bool showPwd;
   bool load;
-  AnimationRoute createRoute = AnimationRoute();
 
   @override
   initState() {
