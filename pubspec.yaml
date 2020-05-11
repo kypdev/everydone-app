@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   firebase_auth:
+  flutter_launcher_icons: ^0.7.5
 
   cupertino_icons: ^0.1.2
   font_awesome_flutter: ^8.5.0
@@ -33,6 +34,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon-app.png"
 
 
 flutter:

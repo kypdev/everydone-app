@@ -26,15 +26,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _deviceName = 'yuwell YE670A';
 
-  _selectPressureDevice() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChooseDevice(),
-      ),
-    );
-  }
-
   String rate = 'default';
 
   Future _savePressure() async {
@@ -80,9 +71,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     print(rate);
 
-    
-    
-
     Alert(
       context: context,
       type: AlertType.success,
@@ -109,8 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
       userID = uid;
     });
 
-
-    if(rate == 'ไม่สามารถคำนวณได้'){
+    if (rate == 'ไม่สามารถคำนวณได้') {
       Alert(
         context: context,
         type: AlertType.success,
@@ -127,45 +114,50 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ).show();
-    }else{
+    } else {
       // add pressure to firebase
       Firestore.instance
           .collection("users")
           .document(userID)
           .collection('pressure')
           .add({
-        "sys": sys,
-        "dia": dia,
-        "pulse": pulse,
-        "create_at": DateTime.now().day.toString() + '/' + DateTime.now().month.toString() + '/' + DateTime.now().year.toString() + ', ' + DateTime.now().hour.toString() + ':' + DateTime.now().minute.toString(),
-        "update_at": FieldValue.serverTimestamp(),
-        "rate": rate,
-        "color": color
-      })
-          .then((result)=>{
-        print('add success')
-      })
+            "sys": sys,
+            "dia": dia,
+            "pulse": pulse,
+            "create_at": DateTime.now().day.toString() +
+                '/' +
+                DateTime.now().month.toString() +
+                '/' +
+                DateTime.now().year.toString() +
+                ', ' +
+                DateTime.now().hour.toString() +
+                ':' +
+                DateTime.now().minute.toString(),
+            "update_at": FieldValue.serverTimestamp(),
+            "rate": rate,
+            "color": color
+          })
+          .then((result) => {print('add success')})
           .catchError((err) {
-        print(err);
-        Alert(
-          context: context,
-          type: AlertType.success,
-          title: "ผลการคำนวณ",
-          desc: rate,
-          buttons: [
-            DialogButton(
-              child: Text(
-                "ยืนยัน",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-              width: 120,
-            )
-          ],
-        ).show();
-      });
+            print(err);
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "ผลการคำนวณ",
+              desc: rate,
+              buttons: [
+                DialogButton(
+                  child: Text(
+                    "ยืนยัน",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  width: 120,
+                )
+              ],
+            ).show();
+          });
     }
-
   }
 
   @override
@@ -283,7 +275,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 TableRow(
                                                   children: [
                                                     NumberPicker.integer(
-                                                      highlightSelectedValue: true,
+                                                      highlightSelectedValue:
+                                                          true,
                                                       initialValue: _sysValue,
                                                       minValue: 20,
                                                       maxValue: 200,
@@ -328,7 +321,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     .width,
                                                 decoration: BoxDecoration(
                                                   color: Colors.greenAccent,
-                                                  borderRadius: BorderRadius.circular(30),
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
                                                 ),
                                                 child: MaterialButton(
                                                   onPressed: _savePressure,
@@ -351,67 +345,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                       width: MediaQuery.of(context).size.width,
                                       child: Column(
                                         children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20, right: 20),
-                                            child: RaisedButton(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(30),
-                                              ),
-                                              color: Colors.greenAccent,
-                                              onPressed: _selectPressureDevice,
-                                              child: Text(
-                                                'เลือกเครื่องวัดความดัน',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontFamily: _kanit,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Text(
-                                                'ชื่อเครื่อง : ',
-                                                style: TextStyle(
-                                                  fontFamily: _kanit,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                              Text(
-                                                _deviceName,
-                                                style: TextStyle(
-                                                  fontFamily: _kanit,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
                                           SizedBox(height: 10),
-                                          Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height /
-                                                4,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                1.5,
-                                            decoration: BoxDecoration(
-                                              color: Colors.amber,
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              image: DecorationImage(
-                                                image: AssetImage(
-                                                  'assets/images/device.jpg',
+                                          InkWell(
+                                            onTap: () {
+                                              
+                                            },
+                                            child: Container(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height /
+                                                  4,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  1.5,
+                                              decoration: BoxDecoration(
+                                                color: Colors.amber,
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                                image: DecorationImage(
+                                                  image: AssetImage(
+                                                    'assets/images/device.jpg',
+                                                  ),
+                                                  fit: BoxFit.cover,
                                                 ),
-                                                fit: BoxFit.cover,
                                               ),
                                             ),
                                           ),
@@ -421,7 +378,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 left: 40, right: 40),
                                             child: MaterialButton(
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(30),
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
                                               ),
                                               color: Colors.greenAccent,
                                               onPressed: () {},
@@ -498,7 +456,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 left: 40, right: 40),
                                             child: MaterialButton(
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(30),
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
                                               ),
                                               color: Colors.greenAccent,
                                               onPressed: () {},

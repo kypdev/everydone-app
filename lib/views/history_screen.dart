@@ -23,7 +23,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
-
   @override
   void initState() {
     inputData();
@@ -50,7 +49,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     .collection("users")
                     .document(userID)
                     .collection('pressure')
-                .orderBy("create_at", descending: true)
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -63,7 +61,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       return new ListView(
                         children: snapshot.data.documents
                             .map((DocumentSnapshot document) {
-
                           return history(
                             rate: document['rate'].toString(),
                             sys: document['sys'].toString(),
@@ -86,7 +83,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                     'Colors.amber')
                                                 ? pColor = Colors.amber
                                                 : pColor = Colors.red,
-
                           );
                         }).toList(),
                       );
@@ -94,7 +90,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 },
               ),
             ),
-
           ],
         ),
       ),
@@ -213,20 +208,3 @@ Widget history({
     ),
   );
 }
-
-
-// import 'package:flutter/material.dart';
-
-// class HistoryScreen extends StatefulWidget {
-//   @override
-//   _HistoryScreenState createState() => _HistoryScreenState();
-// }
-
-// class _HistoryScreenState extends State<HistoryScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       color: Colors.amber,
-//     );
-//   }
-// }
