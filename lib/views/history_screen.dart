@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,7 +14,8 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   String userID = '';
   Color pColor;
-
+  final firestore = Firestore.instance;
+  final Future<FirebaseUser> firebase = FirebaseAuth.instance.currentUser();
   inputData() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     final FirebaseUser user = await auth.currentUser();
@@ -26,9 +29,31 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     inputData();
-    print(userID);
-
     super.initState();
+    _getdata();
+  }
+
+  Future _getdata() async {
+    var data;
+    firestore.collection("users").getDocuments().then((sn) {
+      sn.documents.forEach((result) {
+        firestore
+            .collection("users")
+            .document(result.documentID)
+            .collection("pressure")
+            .getDocuments()
+            .then((query) {
+          query.documents.forEach((result) {
+            print(result.data.runtimeType);
+            setState(() {
+              data = result.data;
+            });
+          });
+        });
+      });
+    });
+    print(data.runtimeType);
+    return data;
   }
 
   @override
@@ -79,7 +104,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                         : (document['color'].toString() ==
                                                 'Colors.amber')
                                             ? pColor = Colors.amber
-                                            : (document['color'].toString() ==
+                                            : (document['color']
+                                                        .toString() ==
                                                     'Colors.amber')
                                                 ? pColor = Colors.amber
                                                 : pColor = Colors.red,

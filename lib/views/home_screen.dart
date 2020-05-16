@@ -358,7 +358,6 @@ class _HomeScreenState extends State<HomeScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(height: 30),
                   Padding(
                     padding: const EdgeInsets.only(left: 20, right: 20),
                     child: Card(
@@ -526,7 +525,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       width: MediaQuery.of(context).size.width,
                                       child: Column(
                                         children: <Widget>[
-                                          SizedBox(height: 10),
+                                          // SizedBox(height: 10),
                                           showImage(),
                                           Padding(
                                             padding: const EdgeInsets.only(
