@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:everydone_app/views/choose_device.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import '../commons/res_alert.dart';
 
 final _kanit = 'Kanit';
 
@@ -32,6 +32,9 @@ class _HomeScreenState extends State<HomeScreen> {
   String statuss = '';
   String base64Image;
   File tmpFile;
+  bool loading = false;
+
+  ResAlert resAlert = ResAlert();
 
   Future _savePressure() async {
     debugPrint('save');
@@ -174,10 +177,11 @@ class _HomeScreenState extends State<HomeScreen> {
           tmpFile = snapshot.data;
           base64Image = base64Encode(snapshot.data.readAsBytesSync());
           return Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+            padding:
+                const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
             child: Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.3,
+              height: MediaQuery.of(context).size.height * 0.4,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
@@ -189,13 +193,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           );
-
-          // Flexible(
-          //   child: Image.file(
-          //     snapshot.data,
-          //     fit: BoxFit.fill,
-          //   ),
-          // );
         } else if (null != snapshot.error) {
           return const Text(
             'Error Picking Image',
@@ -204,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
         } else {
           return Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.4,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/no-image.png'),
@@ -212,11 +209,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           );
-
-          // const Text(
-          //   'No Image Selected',
-          //   textAlign: TextAlign.center,
-          // );
         }
       },
     );
@@ -263,6 +255,55 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         });
+  }
+
+  startUpload() {
+    setState(()=>loading = true);
+    if (tmpFile == null) {
+      print('tmpfile null');
+      return;
+    }
+    String fileName = tmpFile.path.split('/').last;
+    upload(fileName);
+    setState(()=>loading = false);
+  }
+
+  upload(String fileName) {
+    var uploadEndPoint = 'http://192.168.130.8/upload-images/upload.php';
+    http.post(uploadEndPoint, body: {
+      "image": base64Image,
+      "name": fileName,
+    }).then((result) {
+      if (result.statusCode == 200) {
+        setState(()=>loading = false);
+        resAlert.resAlert(
+          context: context,
+          alertType: AlertType.success,
+          title: 'บันทึกรูปสำเร็จ',
+          desc: '',
+          btnColor: Color(0xff00bbf9),
+        );
+      } else {
+        setState(()=>loading = false);
+        resAlert.resAlert(
+          context: context,
+          alertType: AlertType.error,
+          title: 'บันทึกรูปไม่สำเร็จ',
+          desc: '',
+          btnColor: Color(0xffef233c),
+        );
+      }
+    }).catchError((error) {
+      setState(()=>loading = false);
+      print('Err: $error');
+      resAlert.resAlert(
+        context: context,
+        alertType: AlertType.error,
+        title: 'บันทึกรูปไม่สำเร็จ',
+        desc: '',
+        btnColor: Color(0xffef233c),
+      );
+    });
   }
 
   @override
@@ -482,14 +523,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                           showImage(),
                                           Padding(
-                                            padding: const EdgeInsets.only(left: 20, right: 20),
+                                            padding: const EdgeInsets.only(
+                                                left: 20, right: 20),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: <Widget>[
                                                 Expanded(
                                                   child: MaterialButton(
-                                                    shape: RoundedRectangleBorder(
+                                                    shape:
+                                                        RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               30),
@@ -501,7 +544,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     },
                                                     child: Text(
                                                       'เลือกรูปภาพ',
-                                                      textAlign: TextAlign.center,
+                                                      textAlign:
+                                                          TextAlign.center,
                                                       style: TextStyle(
                                                         fontFamily: _kanit,
                                                         color: Colors.white,
@@ -513,18 +557,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 SizedBox(width: 20),
                                                 Expanded(
                                                   child: MaterialButton(
-                                                    shape: RoundedRectangleBorder(
+                                                    shape:
+                                                        RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               30),
                                                     ),
                                                     color: Color(0xffffd6a5),
                                                     onPressed: () {
-                                                      print('send image to server');
+                                                      print(
+                                                          'send image to server');
+                                                      startUpload();
                                                     },
                                                     child: Text(
                                                       'บันทึก',
-                                                      textAlign: TextAlign.center,
+                                                      textAlign:
+                                                          TextAlign.center,
                                                       style: TextStyle(
                                                         fontFamily: _kanit,
                                                         color: Colors.white,
@@ -653,6 +701,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ],
+              ),
+              Center(
+                child: Visibility(
+                  visible: loading,
+                  child: CircularProgressIndicator(),
+                ),
               ),
             ],
           ),

@@ -10,9 +10,15 @@ void main() => runApp(
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: SplashPage(), routes: <String, WidgetBuilder>{
-      '/home': (BuildContext context) => BottomNavy(),
-      '/login': (BuildContext context) => SigninScreen(),
-    });
+    return MaterialApp(
+      home: SplashPage(),
+      routes: <String, WidgetBuilder>{
+        '/home': (BuildContext context) => BottomNavy(),
+        '/login': (BuildContext context) => SigninScreen(),
+      },
+      theme: ThemeData(
+        fontFamily: 'Kanit',
+      ),
+    );
   }
 }
