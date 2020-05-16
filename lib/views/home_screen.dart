@@ -379,13 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color = 'Colors.greenAccent';
         rate = 'ปกติ';
       });
-      resAlert.resAlert(
-        context: context,
-        alertType: AlertType.success,
-        title: 'ผลการคำนวณ',
-        desc: rate,
-        btnColor: Color(0xff00bcd4),
-      );
+      
 
       FirebaseAuth auth = FirebaseAuth.instance;
       final FirebaseUser user = await auth.currentUser();
@@ -418,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
           context: context,
           alertType: AlertType.success,
           title: 'บันทึกสำเร็จ',
-          desc: '',
+          desc: 'ผลการคำนวณ $rate',
           btnColor: Color(0xff00bcd4),
         );
       }).catchError((err) {

@@ -1,4 +1,5 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:everydone_app/views/edit_profile.dart';
 import 'package:everydone_app/views/history_screen.dart';
 import 'package:everydone_app/views/home_screen.dart';
 import 'package:everydone_app/views/reccommend_screen.dart';
@@ -44,7 +45,7 @@ class _BottomNavyState extends State<BottomNavy> {
             HomeScreen(),
             HistoryScreen(),
             ReccommendScreen(),
-            SettingScreen(),
+            EditProfile(),
           ],
         ),
       ),
