@@ -258,14 +258,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   startUpload() {
-    setState(()=>loading = true);
+    setState(() => loading = true);
     if (tmpFile == null) {
       print('tmpfile null');
       return;
     }
     String fileName = tmpFile.path.split('/').last;
     upload(fileName);
-    setState(()=>loading = false);
+    setState(() => loading = false);
   }
 
   upload(String fileName) {
@@ -275,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
       "name": fileName,
     }).then((result) {
       if (result.statusCode == 200) {
-        setState(()=>loading = false);
+        setState(() => loading = false);
         resAlert.resAlert(
           context: context,
           alertType: AlertType.success,
@@ -284,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
           btnColor: Color(0xff00bbf9),
         );
       } else {
-        setState(()=>loading = false);
+        setState(() => loading = false);
         resAlert.resAlert(
           context: context,
           alertType: AlertType.error,
@@ -294,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
     }).catchError((error) {
-      setState(()=>loading = false);
+      setState(() => loading = false);
       print('Err: $error');
       resAlert.resAlert(
         context: context,
@@ -304,6 +304,29 @@ class _HomeScreenState extends State<HomeScreen> {
         btnColor: Color(0xffef233c),
       );
     });
+  }
+
+  processPressureImg() async {
+    print('process img');
+    var processImgUrl = 'http://localhost:8000/req-ocr/';
+    var url = 'https://jsonplaceholder.typicode.com/posts';
+    // try {
+    //   var res = await http.get(
+    //     processImgUrl,
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   );
+    //   print(res.body);
+    // } catch (e) {
+    //   print('Err: $e');
+    // }
+
+    var res = await http.get(processImgUrl);
+
+    print('res: ${res}');
+
+
   }
 
   @override
@@ -490,37 +513,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: Column(
                                         children: <Widget>[
                                           SizedBox(height: 10),
-                                          // InkWell(
-                                          //   onTap: () {
-                                          //     // todo choose image
-                                          //     chooseImage();
-                                          //   },
-                                          //   child: Container(
-                                          //     height: MediaQuery.of(context)
-                                          //             .size
-                                          //             .height /
-                                          //         4,
-                                          //     width: MediaQuery.of(context)
-                                          //             .size
-                                          //             .width /
-                                          //         1.5,
-                                          //     decoration: BoxDecoration(
-                                          //       color: Colors.amber,
-                                          //       borderRadius:
-                                          //           BorderRadius.circular(30),
-                                          //       image:
-                                          //       file == null ?
-                                          //       DecorationImage(
-                                          //         image: AssetImage(
-                                          //           'assets/images/device.jpg',
-                                          //         ),
-                                          //         fit: BoxFit.cover,
-                                          //       ) :
-                                          //       showImage(),
-                                          //     ),
-                                          //   ),
-                                          // ),
-
                                           showImage(),
                                           Padding(
                                             padding: const EdgeInsets.only(
@@ -584,7 +576,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ],
                                             ),
                                           ),
-
                                           SizedBox(height: 10),
                                           Padding(
                                             padding: const EdgeInsets.only(
@@ -595,7 +586,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     BorderRadius.circular(30),
                                               ),
                                               color: Color(0xfffee440),
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                processPressureImg();
+                                              },
                                               child: Container(
                                                 width: MediaQuery.of(context)
                                                     .size
