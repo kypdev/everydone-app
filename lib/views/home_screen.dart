@@ -173,15 +173,19 @@ class _HomeScreenState extends State<HomeScreen> {
             null != snapshot.data) {
           tmpFile = snapshot.data;
           base64Image = base64Encode(snapshot.data.readAsBytesSync());
-          return Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.3,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: FileImage(
-                  snapshot.data,
+          return Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.3,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                image: DecorationImage(
+                  image: FileImage(
+                    snapshot.data,
+                  ),
+                  fit: BoxFit.fill,
                 ),
-                fit: BoxFit.cover,
               ),
             ),
           );
@@ -200,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
         } else {
           return Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.2,
+            height: MediaQuery.of(context).size.height * 0.3,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/no-image.png'),
@@ -493,6 +497,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     color: Color(0xff00b4d8),
                                                     onPressed: () {
                                                       print('choose image');
+                                                      chooseImage();
                                                     },
                                                     child: Text(
                                                       'เลือกรูปภาพ',
