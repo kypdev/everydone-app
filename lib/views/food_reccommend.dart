@@ -4,89 +4,72 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-final _kanit = 'Kanit';
-
 class FoodReccommend extends StatefulWidget {
   @override
   _FoodReccommendState createState() => _FoodReccommendState();
 }
-enum TtsState { playing, stopped }
-class _FoodReccommendState extends State<FoodReccommend> {
 
+enum TtsState { playing, stopped }
+
+class _FoodReccommendState extends State<FoodReccommend> {
   FlutterTts flutterTts;
+  dynamic languages;
+  String language;
   TtsState ttsState = TtsState.stopped;
 
-  get isPlaying => ttsState == TtsState.playing;
 
-  get isStopped => ttsState == TtsState.stopped;
 
-  @override
-  initState() {
-    super.initState();
-    initTts();
-  }
-
-  initTts() {
+  initTts(){
     flutterTts = FlutterTts();
+    _getLanguages();
 
-//    _getLanguages();
-
-    flutterTts.setStartHandler(() {
-      setState(() {
-        print("playing");
-        ttsState = TtsState.playing;
-      });
-    });
-
-    flutterTts.setCompletionHandler(() {
-      setState(() {
-        print("Complete");
-        ttsState = TtsState.stopped;
-      });
-    });
-
-    flutterTts.setErrorHandler((msg) {
-      setState(() {
-        print("error: $msg");
-        ttsState = TtsState.stopped;
-      });
-    });
   }
 
-  Future _speak(String desc) async {
-    await flutterTts.isLanguageAvailable("th-TH");
-    if (desc != null) {
-      if (desc.isNotEmpty) {
-        var result = await flutterTts.speak(desc);
-        if (result == 1) setState(() => ttsState = TtsState.playing);
-      }
-    }
+  Future _getLanguages() async {
+    languages = await flutterTts.getLanguages;
+    if (languages != null) setState(() => languages);
+  }
+
+  Future _speak(desc) async {
+    var result = await flutterTts.speak(desc);
+    // if (result == 1) setState(() => ttsState = TtsState.playing);
+
   }
 
   Future _stop() async {
     var result = await flutterTts.stop();
-    if (result == 1) setState(() => ttsState = TtsState.stopped);
+    // if (result == 1) setState(() => ttsState = TtsState.stopped);
   }
+
+  @override
+  void initState() {
+    super.initState();
+    initTts();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    flutterTts.stop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'อาหารที่แนะนำ',
-          style: TextStyle(fontFamily: _kanit),
         ),
         backgroundColor: Colors.greenAccent,
         centerTitle: true,
       ),
       body: Stack(
         children: <Widget>[
-
           Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             color: Colors.black12,
           ),
-
           SafeArea(
             child: Center(
               child: Container(
@@ -127,15 +110,22 @@ class _FoodReccommendState extends State<FoodReccommend> {
                                             width: 200,
                                             height: 150,
                                             decoration: BoxDecoration(
-                                              border: Border.all(color: Colors.black),
-                                              borderRadius: new BorderRadius.only(
-                                                topLeft: const Radius.circular(5),
-                                                topRight: const Radius.circular(5),
-                                                bottomLeft: const Radius.circular(5),
-                                                bottomRight: const Radius.circular(5),
+                                              border: Border.all(
+                                                  color: Colors.black),
+                                              borderRadius:
+                                                  new BorderRadius.only(
+                                                topLeft:
+                                                    const Radius.circular(5),
+                                                topRight:
+                                                    const Radius.circular(5),
+                                                bottomLeft:
+                                                    const Radius.circular(5),
+                                                bottomRight:
+                                                    const Radius.circular(5),
                                               ),
                                               image: DecorationImage(
-                                                image: NetworkImage(document['img']),
+                                                image: NetworkImage(
+                                                    document['img']),
                                                 fit: BoxFit.cover,
                                               ),
                                             ),
@@ -146,7 +136,7 @@ class _FoodReccommendState extends State<FoodReccommend> {
                                           Text(
                                             '${document['title']}',
                                             style: TextStyle(
-                                                fontFamily: _kanit, fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold),
                                           ),
                                           SizedBox(
                                             height: 5,
@@ -154,9 +144,7 @@ class _FoodReccommendState extends State<FoodReccommend> {
                                           Container(
                                             child: Text(
                                               '     ${document['desc']}',
-                                              style: TextStyle(
-                                                fontFamily: _kanit,
-                                              ),
+                                              style: TextStyle(),
                                             ),
                                           ),
                                           SizedBox(
@@ -164,22 +152,25 @@ class _FoodReccommendState extends State<FoodReccommend> {
                                           ),
                                           Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                                MainAxisAlignment.center,
                                             children: <Widget>[
                                               IconButton(
                                                 icon: Icon(
                                                   FontAwesomeIcons.volumeUp,
                                                   color: Colors.grey,
                                                 ),
-                                                onPressed: () =>
-                                                    _speak(document['desc']),
+                                                onPressed: () {
+                                                  _speak(document['desc']);
+                                                },
                                               ),
                                               IconButton(
                                                 icon: Icon(
                                                   FontAwesomeIcons.volumeMute,
                                                   color: Colors.grey,
                                                 ),
-                                                onPressed: () => _stop,
+                                                onPressed: () {
+                                                  _stop();
+                                                },
                                               ),
                                             ],
                                           ),
@@ -250,8 +241,7 @@ Widget foodMenu({
                 ),
                 Text(
                   title,
-                  style: TextStyle(
-                      fontFamily: _kanit, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(
                   height: 5,
@@ -259,9 +249,6 @@ Widget foodMenu({
                 Container(
                   child: Text(
                     des,
-                    style: TextStyle(
-                      fontFamily: _kanit,
-                    ),
                   ),
                 ),
                 SizedBox(

@@ -14,137 +14,48 @@ class SymptomScreen extends StatefulWidget {
 enum TtsState { playing, stopped }
 
 class _SymptomScreenState extends State<SymptomScreen> {
+
   FlutterTts flutterTts;
+  dynamic languages;
+  String language;
   TtsState ttsState = TtsState.stopped;
 
-  get isPlaying => ttsState == TtsState.playing;
 
-  get isStopped => ttsState == TtsState.stopped;
 
-  @override
-  initState() {
-    super.initState();
-    initTts();
-  }
-
-  initTts() {
+  initTts(){
     flutterTts = FlutterTts();
+    _getLanguages();
 
-//    _getLanguages();
-
-    flutterTts.setStartHandler(() {
-      setState(() {
-        print("playing");
-        ttsState = TtsState.playing;
-      });
-    });
-
-    flutterTts.setCompletionHandler(() {
-      setState(() {
-        print("Complete");
-        ttsState = TtsState.stopped;
-      });
-    });
-
-    flutterTts.setErrorHandler((msg) {
-      setState(() {
-        print("error: $msg");
-        ttsState = TtsState.stopped;
-      });
-    });
   }
 
-  Future _speak(String desc) async {
-    await flutterTts.isLanguageAvailable("th-TH");
-    if (desc != null) {
-      if (desc.isNotEmpty) {
-        var result = await flutterTts.speak(desc);
-        if (result == 1) setState(() => ttsState = TtsState.playing);
-      }
-    }
+  Future _getLanguages() async {
+    languages = await flutterTts.getLanguages;
+    if (languages != null) setState(() => languages);
+  }
+
+  Future _speak(desc) async {
+    var result = await flutterTts.speak(desc);
+    // if (result == 1) setState(() => ttsState = TtsState.playing);
+
   }
 
   Future _stop() async {
     var result = await flutterTts.stop();
-    if (result == 1) setState(() => ttsState = TtsState.stopped);
+    // if (result == 1) setState(() => ttsState = TtsState.stopped);
   }
 
-  Widget symptonMenu({
-    w,
-    String title,
-    String des,
-  }) {
-    _textToSpeechPlay() {
-      print('text to speech play');
-    }
-
-    _textToSpeechPause() {
-      print('text to speech pause');
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Container(
-        width: w,
-        child: Container(
-          color: Colors.white,
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                title,
-                style: TextStyle(
-                  fontFamily: _kanit,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  '     ' + des,
-                  style: TextStyle(
-                    fontFamily: _kanit,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 4,
-              ),
-              Container(
-                width: w,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(
-                        FontAwesomeIcons.volumeUp,
-                        color: Colors.grey,
-                      ),
-                      onPressed: _textToSpeechPlay,
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        FontAwesomeIcons.volumeMute,
-                        color: Colors.grey,
-                      ),
-                      onPressed: _textToSpeechPause,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    initTts();
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    flutterTts.stop();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -227,15 +138,18 @@ class _SymptomScreenState extends State<SymptomScreen> {
                                               FontAwesomeIcons.volumeUp,
                                               color: Colors.grey,
                                             ),
-                                            onPressed: () =>
-                                                _speak(document['desc']),
+                                            onPressed: () {
+                                              _speak(document['desc']);
+                                            },
                                           ),
                                           IconButton(
                                             icon: Icon(
                                               FontAwesomeIcons.volumeMute,
                                               color: Colors.grey,
                                             ),
-                                            onPressed: () => _stop,
+                                            onPressed: () {
+                                              _stop();
+                                            },
                                           ),
                                         ],
                                       ),
