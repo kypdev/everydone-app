@@ -224,7 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  
+
   Future uploadImage(BuildContext context) async {
     String fileName = basename(_imageFile.path);
     final StorageReference firebaseStorageRef = FirebaseStorage.instance

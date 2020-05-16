@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:everydone_app/views/choose_device.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,6 +7,9 @@ import 'package:flutter/rendering.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 final _kanit = 'Kanit';
 
@@ -23,10 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _diaImgValue = 96;
   String userID = '';
   String color;
-
-  String _deviceName = 'yuwell YE670A';
-
   String rate = 'default';
+  Future<File> file;
+  String statuss = '';
+  String base64Image;
+  File tmpFile;
 
   Future _savePressure() async {
     debugPrint('save');
@@ -160,11 +165,107 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget showImage() {
+    return FutureBuilder<File>(
+      future: file,
+      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            null != snapshot.data) {
+          tmpFile = snapshot.data;
+          base64Image = base64Encode(snapshot.data.readAsBytesSync());
+          return Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.3,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: FileImage(
+                  snapshot.data,
+                ),
+                fit: BoxFit.cover,
+              ),
+            ),
+          );
+
+          // Flexible(
+          //   child: Image.file(
+          //     snapshot.data,
+          //     fit: BoxFit.fill,
+          //   ),
+          // );
+        } else if (null != snapshot.error) {
+          return const Text(
+            'Error Picking Image',
+            textAlign: TextAlign.center,
+          );
+        } else {
+          return Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.2,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/no-image.png'),
+                fit: BoxFit.contain,
+              ),
+            ),
+          );
+
+          // const Text(
+          //   'No Image Selected',
+          //   textAlign: TextAlign.center,
+          // );
+        }
+      },
+    );
+  }
+
+  chooseImage() {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            child: new Wrap(
+              children: <Widget>[
+                new ListTile(
+                  leading: new Icon(Icons.camera_alt),
+                  title: new Text(
+                    'กล้อง',
+                    style: TextStyle(
+                      fontFamily: _kanit,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      file = ImagePicker.pickImage(source: ImageSource.camera);
+                    });
+                    Navigator.pop(context);
+                  },
+                ),
+                new ListTile(
+                  leading: new Icon(Icons.photo_library),
+                  title: new Text(
+                    'คลังรูปภาพ',
+                    style: TextStyle(
+                      fontFamily: _kanit,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      file = ImagePicker.pickImage(source: ImageSource.gallery);
+                      Navigator.pop(context);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
+    return SafeArea(
+      child: Scaffold(
+        body: SingleChildScrollView(
           child: Stack(
             children: <Widget>[
               Container(
@@ -175,9 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(
-                    height: 30,
-                  ),
+                  SizedBox(height: 30),
                   Padding(
                     padding: const EdgeInsets.only(left: 20, right: 20),
                     child: Card(
@@ -346,42 +445,103 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: Column(
                                         children: <Widget>[
                                           SizedBox(height: 10),
-                                          InkWell(
-                                            onTap: () {
-                                              
-                                            },
-                                            child: Container(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height /
-                                                  4,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  1.5,
-                                              decoration: BoxDecoration(
-                                                color: Colors.amber,
-                                                borderRadius:
-                                                    BorderRadius.circular(30),
-                                                image: DecorationImage(
-                                                  image: AssetImage(
-                                                    'assets/images/device.jpg',
+                                          // InkWell(
+                                          //   onTap: () {
+                                          //     // todo choose image
+                                          //     chooseImage();
+                                          //   },
+                                          //   child: Container(
+                                          //     height: MediaQuery.of(context)
+                                          //             .size
+                                          //             .height /
+                                          //         4,
+                                          //     width: MediaQuery.of(context)
+                                          //             .size
+                                          //             .width /
+                                          //         1.5,
+                                          //     decoration: BoxDecoration(
+                                          //       color: Colors.amber,
+                                          //       borderRadius:
+                                          //           BorderRadius.circular(30),
+                                          //       image:
+                                          //       file == null ?
+                                          //       DecorationImage(
+                                          //         image: AssetImage(
+                                          //           'assets/images/device.jpg',
+                                          //         ),
+                                          //         fit: BoxFit.cover,
+                                          //       ) :
+                                          //       showImage(),
+                                          //     ),
+                                          //   ),
+                                          // ),
+
+                                          showImage(),
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 20, right: 20),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: <Widget>[
+                                                Expanded(
+                                                  child: MaterialButton(
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              30),
+                                                    ),
+                                                    color: Color(0xff00b4d8),
+                                                    onPressed: () {
+                                                      print('choose image');
+                                                    },
+                                                    child: Text(
+                                                      'เลือกรูปภาพ',
+                                                      textAlign: TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontFamily: _kanit,
+                                                        color: Colors.white,
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
                                                   ),
-                                                  fit: BoxFit.cover,
                                                 ),
-                                              ),
+                                                SizedBox(width: 20),
+                                                Expanded(
+                                                  child: MaterialButton(
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              30),
+                                                    ),
+                                                    color: Color(0xffffd6a5),
+                                                    onPressed: () {
+                                                      print('send image to server');
+                                                    },
+                                                    child: Text(
+                                                      'บันทึก',
+                                                      textAlign: TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontFamily: _kanit,
+                                                        color: Colors.white,
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
+
                                           SizedBox(height: 10),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                left: 40, right: 40),
+                                                left: 20, right: 20),
                                             child: MaterialButton(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(30),
                                               ),
-                                              color: Colors.greenAccent,
+                                              color: Color(0xfffee440),
                                               onPressed: () {},
                                               child: Container(
                                                 width: MediaQuery.of(context)
@@ -453,7 +613,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                left: 40, right: 40),
+                                                left: 20, right: 20),
                                             child: MaterialButton(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
