@@ -37,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
   ResAlert resAlert = ResAlert();
 
   Future _savePressure() async {
-    debugPrint('save');
     int sys = int.parse(_sysValue.toString());
     int dia = int.parse(_diaValue.toString());
     int pulse = int.parse(_pulseValue.toString());
@@ -314,16 +313,33 @@ class _HomeScreenState extends State<HomeScreen> {
       var res = await http.get(processImgUrl);
       var resMsg = jsonDecode(res.body);
 
-      
+      print(res.statusCode);
 
       setState(() {
         loading = false;
         _sysImgValue = resMsg['sys'];
         _diaImgValue = resMsg['dia'];
       });
+
+      resAlert.resAlert(
+        context: context,
+        alertType: AlertType.success,
+        title: 'ประมวลผลสำเร็จ',
+        desc: 'sys: $_sysImgValue,  dia: $_diaImgValue',
+        btnColor: Color(0xff00bcd4),
+      );
+
     } catch (e) {
       print(e);
     }
+  }
+
+  _savePressureImg(){
+    int sys = int.parse(_sysImgValue);
+    int dia = int.parse(_diaImgValue);
+
+    // todo img save pressure
+    print('debug: $rate');
   }
 
   @override
@@ -332,6 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         body: SingleChildScrollView(
           child: Stack(
+            alignment: Alignment.center,
             children: <Widget>[
               Container(
                 width: MediaQuery.of(context).size.width,
@@ -604,25 +621,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                           Table(
                                             columnWidths: {
-                                              0: FlexColumnWidth(3),
-                                              1: FlexColumnWidth(3),
-                                              2: FlexColumnWidth(2),
+                                              0: FlexColumnWidth(2.5),
+                                              1: FlexColumnWidth(0.25),
+                                              2: FlexColumnWidth(2.5),
                                             },
                                             children: [
                                               TableRow(
                                                 children: [
-                                                  Text(
-                                                    'SYS:',
-                                                    textAlign: TextAlign.end,
-                                                    style: TextStyle(
-                                                        fontFamily: _kanit,
-                                                        fontSize: 40),
+                                                  Container(
+                                                    child: Text(
+                                                      'SYS: ',
+                                                      textAlign: TextAlign.end,
+                                                      style: TextStyle(
+                                                          fontFamily: _kanit,
+                                                          fontSize: 40),
+                                                    ),
                                                   ),
-                                                  Text(
-                                                    _sysImgValue,
-                                                    style: TextStyle(
-                                                        fontFamily: _kanit,
-                                                        fontSize: 40),
+                                                  Container(),
+                                                  Container(
+                                                    child: Text(
+                                                      _sysImgValue,
+                                                      style: TextStyle(
+                                                          fontFamily: _kanit,
+                                                          fontSize: 40),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -630,20 +652,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                           Table(
                                             columnWidths: {
-                                              0: FlexColumnWidth(3),
-                                              1: FlexColumnWidth(3),
-                                              2: FlexColumnWidth(2),
+                                              0: FlexColumnWidth(2.5),
+                                              1: FlexColumnWidth(0.25),
+                                              2: FlexColumnWidth(2.5),
                                             },
                                             children: [
                                               TableRow(
                                                 children: [
                                                   Text(
-                                                    'DIA:',
+                                                    'DIA: ',
                                                     textAlign: TextAlign.end,
                                                     style: TextStyle(
                                                         fontFamily: _kanit,
                                                         fontSize: 40),
                                                   ),
+                                                  Container(),
                                                   Text(
                                                     _diaImgValue.toString(),
                                                     style: TextStyle(
@@ -663,7 +686,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     BorderRadius.circular(30),
                                               ),
                                               color: Colors.greenAccent,
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                _savePressureImg();
+                                              },
                                               child: Container(
                                                 width: MediaQuery.of(context)
                                                     .size
