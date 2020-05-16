@@ -328,13 +328,12 @@ class _HomeScreenState extends State<HomeScreen> {
         desc: 'sys: $_sysImgValue,  dia: $_diaImgValue',
         btnColor: Color(0xff00bcd4),
       );
-
     } catch (e) {
       print(e);
     }
   }
 
-  _savePressureImg(){
+  _savePressureImg() {
     int sys = int.parse(_sysImgValue);
     int dia = int.parse(_diaImgValue);
 
@@ -346,360 +345,224 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                color: Colors.black12,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Card(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+        body: Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              color: Colors.black12,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 10, bottom: 10),
+              child: SingleChildScrollView(
+                child: Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Row(
                           children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 20),
-                              child: Row(
-                                children: <Widget>[
-                                  Switch(
-                                    activeColor: Colors.greenAccent,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        status = value;
-                                      });
-                                    },
-                                    value: status,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'ใส่ด้วยตนเอง',
-                                    style: TextStyle(
-                                      fontFamily: _kanit,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ],
+                            Switch(
+                              activeColor: Colors.greenAccent,
+                              onChanged: (value) {
+                                setState(() {
+                                  status = value;
+                                });
+                              },
+                              value: status,
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              'ใส่ด้วยตนเอง',
+                              style: TextStyle(
+                                fontFamily: _kanit,
+                                fontSize: 18,
                               ),
                             ),
-                            Container(
-                              child: status
-                                  ? Center(
-                                      child: Container(
-                                        child: Column(
-                                          children: <Widget>[
-                                            Column(
-                                              children: <Widget>[
-                                                Table(
-                                                  columnWidths: {
-                                                    0: FlexColumnWidth(2.0),
-                                                    1: FlexColumnWidth(6.0),
-                                                    2: FlexColumnWidth(8.0),
-                                                    3: FlexColumnWidth(6.0),
-                                                  },
-                                                  children: [
-                                                    TableRow(
-                                                      children: [
-                                                        Container(),
-                                                        Container(
-                                                          child: Text(
-                                                            'Systolic',
-                                                            style: TextStyle(
-                                                              fontFamily:
-                                                                  _kanit,
-                                                              fontSize: 22.0,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Container(
-                                                          child: Text(
-                                                            'Diastolic',
-                                                            style: TextStyle(
-                                                              fontFamily:
-                                                                  _kanit,
-                                                              fontSize: 22.0,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Container(
-                                                          child: Text(
-                                                            'Pulse',
-                                                            style: TextStyle(
-                                                              fontFamily:
-                                                                  _kanit,
-                                                              fontSize: 22.0,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            Table(
-                                              columnWidths: {
-                                                0: FlexColumnWidth(5.0),
-                                                1: FlexColumnWidth(5.0),
-                                                2: FlexColumnWidth(5.0),
-                                              },
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: status
+                            ? Container(
+                                padding: EdgeInsets.only(top: 20, bottom: 20),
+                                child: Column(
+                                  children: <Widget>[
+                                    Column(
+                                      children: <Widget>[
+                                        Table(
+                                          columnWidths: {
+                                            0: FlexColumnWidth(2.0),
+                                            1: FlexColumnWidth(6.0),
+                                            2: FlexColumnWidth(8.0),
+                                            3: FlexColumnWidth(6.0),
+                                          },
+                                          children: [
+                                            TableRow(
                                               children: [
-                                                TableRow(
-                                                  children: [
-                                                    NumberPicker.integer(
-                                                      highlightSelectedValue:
-                                                          true,
-                                                      initialValue: _sysValue,
-                                                      minValue: 20,
-                                                      maxValue: 200,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          _sysValue = value;
-                                                        });
-                                                      },
-                                                    ),
-                                                    NumberPicker.integer(
-                                                      initialValue: _diaValue,
-                                                      minValue: 20,
-                                                      maxValue: 200,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          _diaValue = value;
-                                                        });
-                                                      },
-                                                    ),
-                                                    NumberPicker.integer(
-                                                      initialValue: _pulseValue,
-                                                      minValue: 20,
-                                                      maxValue: 200,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          _pulseValue = value;
-                                                        });
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 20),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 20),
-                                              child: Container(
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.greenAccent,
-                                                  borderRadius:
-                                                      BorderRadius.circular(30),
-                                                ),
-                                                child: MaterialButton(
-                                                  onPressed: _savePressure,
+                                                Container(),
+                                                Container(
                                                   child: Text(
-                                                    'บันทึก',
+                                                    'Systolic',
                                                     style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 20.0,
                                                       fontFamily: _kanit,
+                                                      fontSize: 22.0,
                                                     ),
                                                   ),
                                                 ),
-                                              ),
+                                                Container(
+                                                  child: Text(
+                                                    'Diastolic',
+                                                    style: TextStyle(
+                                                      fontFamily: _kanit,
+                                                      fontSize: 22.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  child: Text(
+                                                    'Pulse',
+                                                    style: TextStyle(
+                                                      fontFamily: _kanit,
+                                                      fontSize: 22.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
+                                      ],
+                                    ),
+                                    Table(
+                                      columnWidths: {
+                                        0: FlexColumnWidth(5.0),
+                                        1: FlexColumnWidth(5.0),
+                                        2: FlexColumnWidth(5.0),
+                                      },
+                                      children: [
+                                        TableRow(
+                                          children: [
+                                            NumberPicker.integer(
+                                              highlightSelectedValue: true,
+                                              initialValue: _sysValue,
+                                              minValue: 20,
+                                              maxValue: 200,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _sysValue = value;
+                                                });
+                                              },
+                                            ),
+                                            NumberPicker.integer(
+                                              initialValue: _diaValue,
+                                              minValue: 20,
+                                              maxValue: 200,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _diaValue = value;
+                                                });
+                                              },
+                                            ),
+                                            NumberPicker.integer(
+                                              initialValue: _pulseValue,
+                                              minValue: 20,
+                                              maxValue: 200,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _pulseValue = value;
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        decoration: BoxDecoration(
+                                          color: Colors.greenAccent,
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        child: MaterialButton(
+                                          onPressed: _savePressure,
+                                          child: Text(
+                                            'บันทึก',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20.0,
+                                              fontFamily: _kanit,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    )
-                                  : Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      child: Column(
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Column(
+                                  children: <Widget>[
+                                    // SizedBox(height: 10),
+                                    showImage(),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20, right: 20),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: <Widget>[
-                                          // SizedBox(height: 10),
-                                          showImage(),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20, right: 20),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                Expanded(
-                                                  child: MaterialButton(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              30),
-                                                    ),
-                                                    color: Color(0xff00b4d8),
-                                                    onPressed: () {
-                                                      print('choose image');
-                                                      chooseImage();
-                                                    },
-                                                    child: Text(
-                                                      'เลือกรูปภาพ',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        fontFamily: _kanit,
-                                                        color: Colors.white,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(width: 20),
-                                                Expanded(
-                                                  child: MaterialButton(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              30),
-                                                    ),
-                                                    color: Color(0xffffd6a5),
-                                                    onPressed: () {
-                                                      print(
-                                                          'send image to server');
-                                                      startUpload();
-                                                    },
-                                                    child: Text(
-                                                      'บันทึก',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        fontFamily: _kanit,
-                                                        color: Colors.white,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(height: 10),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20, right: 20),
+                                          Expanded(
                                             child: MaterialButton(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(30),
                                               ),
-                                              color: Color(0xfffee440),
+                                              color: Color(0xff00b4d8),
                                               onPressed: () {
-                                                processPressureImg();
+                                                print('choose image');
+                                                chooseImage();
                                               },
-                                              child: Container(
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                child: Text(
-                                                  'คำนวณ',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontFamily: _kanit,
-                                                    color: Colors.white,
-                                                    fontSize: 18,
-                                                  ),
+                                              child: Text(
+                                                'เลือกรูปภาพ',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontFamily: _kanit,
+                                                  color: Colors.white,
+                                                  fontSize: 18,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          Table(
-                                            columnWidths: {
-                                              0: FlexColumnWidth(2.5),
-                                              1: FlexColumnWidth(0.25),
-                                              2: FlexColumnWidth(2.5),
-                                            },
-                                            children: [
-                                              TableRow(
-                                                children: [
-                                                  Container(
-                                                    child: Text(
-                                                      'SYS: ',
-                                                      textAlign: TextAlign.end,
-                                                      style: TextStyle(
-                                                          fontFamily: _kanit,
-                                                          fontSize: 40),
-                                                    ),
-                                                  ),
-                                                  Container(),
-                                                  Container(
-                                                    child: Text(
-                                                      _sysImgValue,
-                                                      style: TextStyle(
-                                                          fontFamily: _kanit,
-                                                          fontSize: 40),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          Table(
-                                            columnWidths: {
-                                              0: FlexColumnWidth(2.5),
-                                              1: FlexColumnWidth(0.25),
-                                              2: FlexColumnWidth(2.5),
-                                            },
-                                            children: [
-                                              TableRow(
-                                                children: [
-                                                  Text(
-                                                    'DIA: ',
-                                                    textAlign: TextAlign.end,
-                                                    style: TextStyle(
-                                                        fontFamily: _kanit,
-                                                        fontSize: 40),
-                                                  ),
-                                                  Container(),
-                                                  Text(
-                                                    _diaImgValue.toString(),
-                                                    style: TextStyle(
-                                                        fontFamily: _kanit,
-                                                        fontSize: 40),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20, right: 20),
+                                          SizedBox(width: 20),
+                                          Expanded(
                                             child: MaterialButton(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(30),
                                               ),
-                                              color: Colors.greenAccent,
+                                              color: Color(0xffffd6a5),
                                               onPressed: () {
-                                                _savePressureImg();
+                                                print('send image to server');
+                                                startUpload();
                                               },
-                                              child: Container(
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                child: Text(
-                                                  'บันทึก',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontFamily: _kanit,
-                                                    color: Colors.white,
-                                                    fontSize: 18,
-                                                  ),
+                                              child: Text(
+                                                'บันทึก',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontFamily: _kanit,
+                                                  color: Colors.white,
+                                                  fontSize: 18,
                                                 ),
                                               ),
                                             ),
@@ -707,23 +570,136 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ],
                                       ),
                                     ),
-                            ),
-                            detailPressure(),
-                          ],
-                        ),
+                                    SizedBox(height: 10),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20, right: 20),
+                                      child: MaterialButton(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        color: Color(0xfffee440),
+                                        onPressed: () {
+                                          processPressureImg();
+                                        },
+                                        child: Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: Text(
+                                            'คำนวณ',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontFamily: _kanit,
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Table(
+                                      columnWidths: {
+                                        0: FlexColumnWidth(2.5),
+                                        1: FlexColumnWidth(0.25),
+                                        2: FlexColumnWidth(2.5),
+                                      },
+                                      children: [
+                                        TableRow(
+                                          children: [
+                                            Container(
+                                              child: Text(
+                                                'SYS: ',
+                                                textAlign: TextAlign.end,
+                                                style: TextStyle(
+                                                    fontFamily: _kanit,
+                                                    fontSize: 40),
+                                              ),
+                                            ),
+                                            Container(),
+                                            Container(
+                                              child: Text(
+                                                _sysImgValue,
+                                                style: TextStyle(
+                                                    fontFamily: _kanit,
+                                                    fontSize: 40),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Table(
+                                      columnWidths: {
+                                        0: FlexColumnWidth(2.5),
+                                        1: FlexColumnWidth(0.25),
+                                        2: FlexColumnWidth(2.5),
+                                      },
+                                      children: [
+                                        TableRow(
+                                          children: [
+                                            Text(
+                                              'DIA: ',
+                                              textAlign: TextAlign.end,
+                                              style: TextStyle(
+                                                  fontFamily: _kanit,
+                                                  fontSize: 40),
+                                            ),
+                                            Container(),
+                                            Text(
+                                              _diaImgValue.toString(),
+                                              style: TextStyle(
+                                                  fontFamily: _kanit,
+                                                  fontSize: 40),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20, right: 20),
+                                      child: MaterialButton(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        color: Colors.greenAccent,
+                                        onPressed: () {
+                                          _savePressureImg();
+                                        },
+                                        child: Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: Text(
+                                            'บันทึก',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontFamily: _kanit,
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                       ),
-                    ),
+                      detailPressure(),
+                    ],
                   ),
-                ],
-              ),
-              Center(
-                child: Visibility(
-                  visible: loading,
-                  child: CircularProgressIndicator(),
                 ),
               ),
-            ],
-          ),
+            ),
+            Center(
+              child: Visibility(
+                visible: loading,
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ],
         ),
       ),
     );
