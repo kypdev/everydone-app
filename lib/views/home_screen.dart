@@ -23,8 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _sysValue = 50;
   int _diaValue = 50;
   int _pulseValue = 50;
-  int _sysImgValue = 126;
-  int _diaImgValue = 96;
+  var _sysImgValue = 'xxx';
+  var _diaImgValue = 'xx';
   String userID = '';
   String color;
   String rate = 'default';
@@ -307,24 +307,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   processPressureImg() async {
+    setState(()=>loading=true);
     print('process img');
-    var processImgUrl = 'http://localhost:8000/req-ocr/';
-    var url = 'https://jsonplaceholder.typicode.com/posts';
-    // try {
-    //   var res = await http.get(
-    //     processImgUrl,
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   );
-    //   print(res.body);
-    // } catch (e) {
-    //   print('Err: $e');
-    // }
+    var processImgUrl = 'http://192.168.130.8:8000/req-ocr/';
+
 
     var res = await http.get(processImgUrl);
+    var resMsg = jsonDecode(res.body);
 
-    print('res: ${res}');
+    setState(() {
+      loading = false;
+      _sysImgValue = resMsg['sys'];
+      _diaImgValue = resMsg['dia'];
+    });
+
 
 
   }
@@ -622,7 +618,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         fontSize: 40),
                                                   ),
                                                   Text(
-                                                    _sysImgValue.toString(),
+                                                    _sysImgValue,
                                                     style: TextStyle(
                                                         fontFamily: _kanit,
                                                         fontSize: 40),
