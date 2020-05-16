@@ -268,6 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   upload(String fileName) {
+    setState(() => loading = true);
     var uploadEndPoint = 'http://192.168.130.8/upload-images/upload.php';
     http.post(uploadEndPoint, body: {
       "image": base64Image,
@@ -333,12 +334,105 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  _savePressureImg() {
+  Future _savePressureImg() async {
     int sys = int.parse(_sysImgValue);
     int dia = int.parse(_diaImgValue);
 
     // todo img save pressure
-    print('debug: $rate');
+    print('p: $sys, $dia');
+
+    if (sys > 160 && dia > 100) {
+      setState(() {
+        rate = 'สูงระดับ 2';
+        color = 'Colors.red';
+      });
+    } else if ((sys >= 141 && sys <= 160) && (dia >= 91 && dia <= 100)) {
+      setState(() {
+        rate = 'สูงระดับ 1';
+        color = 'Colors.amber';
+      });
+    } else if ((sys >= 121 && sys <= 140) && (dia >= 81 && dia <= 90)) {
+      setState(() {
+        rate = 'สูงกว่าปกติ';
+        color = 'Colors.yellow';
+      });
+    } else if ((sys >= 91 && sys <= 120) && (dia >= 61 && dia <= 80)) {
+      setState(() {
+        rate = 'ปกติ';
+        color = 'Colors.greenAccent';
+      });
+    } else if (sys < 90 && dia < 60) {
+      setState(() {
+        rate = 'ต่ำ';
+        color = 'Colors.purple';
+      });
+    } else {
+      setState(() {
+        rate = 'ไม่สามารถคำนวณได้';
+      });
+    }
+
+    var map = ((2 * dia) + sys) / 3;
+    var mapasfix = map.toStringAsFixed(2);
+    if (double.parse(mapasfix) <= 110) {
+      setState(() {
+        color = 'Colors.greenAccent';
+        rate = 'ปกติ';
+      });
+      resAlert.resAlert(
+        context: context,
+        alertType: AlertType.success,
+        title: 'ผลการคำนวณ',
+        desc: rate,
+        btnColor: Color(0xff00bcd4),
+      );
+
+      FirebaseAuth auth = FirebaseAuth.instance;
+      final FirebaseUser user = await auth.currentUser();
+      final uid = user.uid.toString();
+      print(uid);
+      setState(() {
+        userID = uid;
+      });
+      Firestore.instance
+          .collection("users")
+          .document(userID)
+          .collection('pressure')
+          .add({
+        "sys": sys,
+        "dia": dia,
+        "create_at": DateTime.now().day.toString() +
+            '/' +
+            DateTime.now().month.toString() +
+            '/' +
+            DateTime.now().year.toString() +
+            ', ' +
+            DateTime.now().hour.toString() +
+            ':' +
+            DateTime.now().minute.toString(),
+        "update_at": FieldValue.serverTimestamp(),
+        "rate": rate,
+        "color": color
+      }).then((result) {
+        resAlert.resAlert(
+          context: context,
+          alertType: AlertType.success,
+          title: 'บันทึกสำเร็จ',
+          desc: '',
+          btnColor: Color(0xff00bcd4),
+        );
+      }).catchError((err) {
+        print(err);
+        print('errorrrrrrrrrrrr');
+        resAlert.resAlert(
+          context: context,
+          alertType: AlertType.error,
+          title: 'บันทึกไม่สำเร็จ',
+          desc: err.toString(),
+          btnColor: Color(0xff00bcd4),
+        );
+      });
+    }
   }
 
   @override
