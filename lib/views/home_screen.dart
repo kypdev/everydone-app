@@ -307,22 +307,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   processPressureImg() async {
-    setState(()=>loading=true);
+    setState(() => loading = true);
     print('process img');
     var processImgUrl = 'http://192.168.130.8:8000/req-ocr/';
+    try {
+      var res = await http.get(processImgUrl);
+      var resMsg = jsonDecode(res.body);
 
+      
 
-    var res = await http.get(processImgUrl);
-    var resMsg = jsonDecode(res.body);
-
-    setState(() {
-      loading = false;
-      _sysImgValue = resMsg['sys'];
-      _diaImgValue = resMsg['dia'];
-    });
-
-
-
+      setState(() {
+        loading = false;
+        _sysImgValue = resMsg['sys'];
+        _diaImgValue = resMsg['dia'];
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
